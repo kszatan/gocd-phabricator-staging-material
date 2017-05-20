@@ -30,8 +30,14 @@ import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 
+import java.util.Collections;
+import java.util.List;
+
 @Extension
 public class PhabricatorStagingPlugin implements GoPlugin {
+    private static final String EXTENSION_NAME = "scm";
+    private static final List<String> supportedExtensionVersions = Collections.singletonList("1.0");
+
     @Override
     public void initializeGoApplicationAccessor(GoApplicationAccessor goApplicationAccessor) {
         
@@ -44,6 +50,6 @@ public class PhabricatorStagingPlugin implements GoPlugin {
 
     @Override
     public GoPluginIdentifier pluginIdentifier() {
-        return null;
+        return new GoPluginIdentifier(EXTENSION_NAME, supportedExtensionVersions);
     }
 }

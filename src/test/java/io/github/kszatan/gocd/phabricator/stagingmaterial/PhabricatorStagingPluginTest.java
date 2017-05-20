@@ -23,6 +23,7 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial;
 
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
+import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import org.junit.Test;
@@ -47,8 +48,10 @@ public class PhabricatorStagingPluginTest {
     }
 
     @Test
-    public void testPluginIdentifier() {
+    public void testPluginIdentifierReturnsCorrectPluginInfo() {
         PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        assertNull("testPluginIdentifier should return null", plugin.pluginIdentifier());
+        GoPluginIdentifier identifier = plugin.pluginIdentifier();
+        assertNotNull("testPluginIdentifier should not return null", identifier);
+        assertEquals("invalid type of extension", "scm", identifier.getExtension());
     }
 }
