@@ -33,14 +33,6 @@ import static org.mockito.Mockito.*;
 
 public class PhabricatorStagingPluginTest {
     @Test
-    public void testInitializeGoApplicationAccessor() {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        GoApplicationAccessor accessor = mock(GoApplicationAccessor.class);
-        plugin.initializeGoApplicationAccessor(accessor);
-        assertTrue(true);
-    }
-
-    @Test
     public void testHandle() throws UnhandledRequestTypeException {
         PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
         GoPluginApiRequest request = mock(GoPluginApiRequest.class);

@@ -22,8 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial;
 
+import com.thoughtworks.go.plugin.api.AbstractGoPlugin;
 import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
-import com.thoughtworks.go.plugin.api.GoPlugin;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.annotation.Extension;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
@@ -34,14 +34,9 @@ import java.util.Collections;
 import java.util.List;
 
 @Extension
-public class PhabricatorStagingPlugin implements GoPlugin {
+public class PhabricatorStagingPlugin extends AbstractGoPlugin {
     private static final String EXTENSION_NAME = "scm";
     private static final List<String> supportedExtensionVersions = Collections.singletonList("1.0");
-
-    @Override
-    public void initializeGoApplicationAccessor(GoApplicationAccessor goApplicationAccessor) {
-        
-    }
 
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest requestMessage) throws UnhandledRequestTypeException {
