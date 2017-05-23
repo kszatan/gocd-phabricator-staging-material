@@ -32,6 +32,7 @@ repositories {
 
 dependencies {
     compile 'cd.go.plugin:go-plugin-api:17.4.+'
+    compile 'com.google.code.gson:gson:2.8.+'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.+'
 }
