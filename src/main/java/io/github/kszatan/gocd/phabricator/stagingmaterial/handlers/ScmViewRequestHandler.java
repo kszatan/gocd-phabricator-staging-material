@@ -22,13 +22,25 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
+import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmView;
+import org.apache.commons.io.IOUtils;
 
 public class ScmViewRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        return DefaultGoPluginApiResponse.error("Not implemented");
+        Gson gson = new Gson();
+        GoPluginApiResponse response;
+        try {
+            String template = IOUtils.toString(getClass().getResourceAsStream("/views/scm-config.template.html"), "UTF-8");
+            ScmView scmView = new ScmView("Phabricator Staging Area", template);
+            response = DefaultGoPluginApiResponse.success(gson.toJson(scmView));
+        } catch (java.io.IOException e) {
+            response = DefaultGoPluginApiResponse.error("Failed to find template: " + e.getMessage());
+        }
+        return response;
     }
 }

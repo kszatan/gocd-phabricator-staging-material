@@ -22,15 +22,25 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
+import com.google.gson.Gson;
+import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
+import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmView;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 public class ScmViewRequestHandlerTest {
+    private ScmViewRequestHandler handler;
     @Before
     public void setUp() throws Exception {
+        handler = new ScmViewRequestHandler();
     }
 
     @After
@@ -38,7 +48,17 @@ public class ScmViewRequestHandlerTest {
     }
 
     @Test
-    public void handle() throws Exception {
+    public void handleShouldReturnSuccessResponseCode() throws Exception {
+        GoPluginApiResponse response = handler.handle(mock(GoPluginApiRequest.class));
+        assertThat(DefaultGoPluginApiResponse.SUCCESS_RESPONSE_CODE, equalTo(response.responseCode()));
     }
 
+    @Test
+    public void handleShouldReturnValidScmView() throws Exception {
+        GoPluginApiResponse response = handler.handle(mock(GoPluginApiRequest.class));
+        Gson gson = new Gson();
+        ScmView configuration = gson.fromJson(response.responseBody(), ScmView.class);
+        assertThat(configuration.displayValue, notNullValue());
+        assertThat(configuration.template, notNullValue());
+    }
 }

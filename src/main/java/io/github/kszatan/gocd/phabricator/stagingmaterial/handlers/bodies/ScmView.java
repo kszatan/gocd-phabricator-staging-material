@@ -1,16 +1,16 @@
 /*
  * Copyright (c) 2017 kszatan
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,30 +20,14 @@
  * SOFTWARE.
  */
 
-apply plugin: 'java'
+package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-    jcenter()
-}
-
-dependencies {
-    compile 'cd.go.plugin:go-plugin-api:17.4.+'
-    compile 'com.google.code.gson:gson:2.8.+'
-    compile 'commons-io:commons-io:2.5'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.+'
-}
-
-jar {
-    from(configurations.compile) {
-        into "lib/"
+public class ScmView {
+    public ScmView() {}
+    public ScmView(String displayValue, String template) {
+        this.displayValue = displayValue;
+        this.template = template;
     }
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.5'
+    public String displayValue;
+    public String template;
 }
