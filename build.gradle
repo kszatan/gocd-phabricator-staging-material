@@ -37,6 +37,12 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.+'
 }
 
+jar {
+    from(configurations.compile) {
+        into "lib/"
+    }
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.5'
 }
