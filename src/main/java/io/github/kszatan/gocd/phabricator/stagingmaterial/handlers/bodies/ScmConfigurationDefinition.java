@@ -24,7 +24,7 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ScmConfiguration {
+public class ScmConfigurationDefinition {
     public class Field {
         @SerializedName("display-name")
         public String displayName;
@@ -42,7 +42,11 @@ public class ScmConfiguration {
         public Boolean required;
     }
 
-    public ScmConfiguration() {
+    public Field url;
+    public Field username;
+    public Field password;
+
+    public ScmConfigurationDefinition() {
         url = new Field();
         url.displayName = "Repository Url";
         url.displayOrder = "0";
@@ -60,8 +64,4 @@ public class ScmConfiguration {
         password.required = false;
         password.secure = true;
     }
-
-    public Field url;
-    public Field username;
-    public Field password;
 }

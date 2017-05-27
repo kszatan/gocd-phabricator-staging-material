@@ -26,7 +26,7 @@ import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationDefinition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,10 +57,10 @@ public class ScmConfigurationRequestHandlerTest {
     public void handleShouldReturnValidScmConfiguration() throws Exception {
         GoPluginApiResponse response = handler.handle(mock(GoPluginApiRequest.class));
         Gson gson = new Gson();
-        ScmConfiguration configuration = gson.fromJson(response.responseBody(), ScmConfiguration.class);
-        assertThat(configuration.url, notNullValue());
-        assertThat(configuration.username, notNullValue());
-        assertThat(configuration.password, notNullValue());
+        ScmConfigurationDefinition definition = gson.fromJson(response.responseBody(), ScmConfigurationDefinition.class);
+        assertThat(definition.url, notNullValue());
+        assertThat(definition.username, notNullValue());
+        assertThat(definition.password, notNullValue());
     }
 
 }
