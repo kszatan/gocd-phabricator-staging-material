@@ -59,7 +59,8 @@ public class PhabricatorStagingPluginTest {
     @Test
     public void handleShouldReturnNonNullResponseForCheckScmConnectionRequest() throws UnhandledRequestTypeException {
         PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "check-scm-connection");
+        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "check-scm-connection");
+        request.setRequestBody("{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}");
         assertNotNull(plugin.handle(request));
     }
 

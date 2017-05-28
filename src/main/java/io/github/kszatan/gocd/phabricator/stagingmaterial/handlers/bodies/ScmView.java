@@ -23,11 +23,13 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 public class ScmView {
+    public String displayValue;
+    public String template;
+
     public ScmView() {}
+
     public ScmView(String displayValue, String template) {
         this.displayValue = displayValue;
         this.template = template;
     }
-    public String displayValue;
-    public String template;
 }

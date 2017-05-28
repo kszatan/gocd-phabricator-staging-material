@@ -25,10 +25,33 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidScmConfigurationStringException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConnectionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
+
+import java.util.Collections;
+import java.util.List;
 
 public class CheckScmConnectionRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        return DefaultGoPluginApiResponse.error("Not implemented");
+        ScmConfiguration configuration;
+        try {
+            configuration = new ScmConfiguration(request.requestBody());
+        } catch (InvalidScmConfigurationStringException e) {
+            return DefaultGoPluginApiResponse.error(
+                    ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
+        }
+        Scm scm = new Scm(configuration);
+        GoPluginApiResponse response;
+        if (scm.canConnect()) {
+            List<String> messages = Collections.singletonList("Successfully connected to " + configuration.url);
+            response = DefaultGoPluginApiResponse.success(
+                    ScmConnectionResult.success(messages).toJson());
+        } else {
+            response = DefaultGoPluginApiResponse.error(ScmConnectionResult.failure(scm.getErrors()).toJson());
+        }
+        return response;
     }
 }
