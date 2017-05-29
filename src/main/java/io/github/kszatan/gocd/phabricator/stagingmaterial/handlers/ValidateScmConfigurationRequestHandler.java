@@ -25,10 +25,24 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ConfigurationValidator;
+
+import java.util.Collections;
+import java.util.List;
 
 public class ValidateScmConfigurationRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        return DefaultGoPluginApiResponse.error("Not implemented");
+        ScmConfiguration configuration;
+        try {
+            configuration = new ScmConfiguration(request.requestBody());
+        } catch (InvalidScmConfigurationStringException e) {
+            return DefaultGoPluginApiResponse.error(
+                    ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
+        }
+        ConfigurationValidator validator = new ConfigurationValidator();
+        ScmConfigurationValidationResult validationResult = validator.validate(configuration);
+        return DefaultGoPluginApiResponse.success(validationResult.toJson());
     }
 }
