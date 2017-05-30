@@ -55,7 +55,7 @@ public class ScmConfiguration {
 
     private String getField(JsonObject jsonObject, String field) throws InvalidScmConfigurationStringException {
         if (!jsonObject.has(field)) {
-            throw new InvalidScmConfigurationStringException();
+            return "";
         }
         return jsonObject.get(field).getAsJsonObject().get("value").getAsString();
     }

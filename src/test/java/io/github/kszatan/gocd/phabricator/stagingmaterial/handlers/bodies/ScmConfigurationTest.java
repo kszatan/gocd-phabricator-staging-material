@@ -43,6 +43,33 @@ public class ScmConfigurationTest {
     }
 
     @Test
+    public void constructorShouldAcceptMissingUrlField() throws Exception {
+        String json = "{\"scm-configuration\":{\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}";
+        ScmConfiguration configuration = new ScmConfiguration(json);
+        assertThat(configuration.url, equalTo(""));
+        assertThat(configuration.username, equalTo("kszatan"));
+        assertThat(configuration.password, equalTo("hunter2"));
+    }
+
+    @Test
+    public void constructorShouldAcceptMissingUserField() throws Exception {
+        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"password\":{\"value\":\"hunter2\"}}}";
+        ScmConfiguration configuration = new ScmConfiguration(json);
+        assertThat(configuration.url, equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
+        assertThat(configuration.username, equalTo(""));
+        assertThat(configuration.password, equalTo("hunter2"));
+    }
+
+    @Test
+    public void constructorShouldAcceptMissingPasswordField() throws Exception {
+        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"}}}";
+        ScmConfiguration configuration = new ScmConfiguration(json);
+        assertThat(configuration.url, equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
+        assertThat(configuration.username, equalTo("kszatan"));
+        assertThat(configuration.password, equalTo(""));
+    }
+
+    @Test
     public void constructorShouldThrowAnExceptionGivenInvalidJson() throws Exception {
         thrown.expect(InvalidScmConfigurationStringException.class);
         String json = "{\"scm-view\":2}";
