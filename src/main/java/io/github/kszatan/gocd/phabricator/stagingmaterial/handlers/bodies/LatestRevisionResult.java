@@ -22,41 +22,33 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
-public class ScmConfiguration {
-    public String url;
-    public String username;
-    public String password;
+import java.util.Objects;
 
-    public ScmConfiguration() {
-        url = "";
-        username = "";
-        password = "";
+public class LatestRevisionResult {
+    public Revision revision;
+    @SerializedName("scm-data")
+    public ScmData scmData;
+
+    public String toJson() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
     }
 
-    public ScmConfiguration(String json) throws InvalidScmConfigurationStringException {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(json).getAsJsonObject();
-        if (!root.has("scm-configuration")) {
-            throw new InvalidScmConfigurationStringException();
-        }
-        JsonObject configuration = root.get("scm-configuration").getAsJsonObject();
-
-        url = getField(configuration, "url");
-        username = getField(configuration, "username");
-        password = getField(configuration, "password");
-    }
-    
-    public boolean hasCredentials() {
-        return !username.isEmpty() && !password.isEmpty();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null) { return false; }
+        if (getClass() != o.getClass()) { return false; }
+        LatestRevisionResult result = (LatestRevisionResult) o;
+        return Objects.equals(revision, result.revision)
+                && Objects.equals(scmData, result.scmData);
     }
 
-    private String getField(JsonObject jsonObject, String field) {
-        if (!jsonObject.has(field)) {
-            return "";
-        }
-        return jsonObject.get(field).getAsJsonObject().get("value").getAsString();
+    @Override
+    public int hashCode() {
+        return Objects.hash(revision, scmData);
     }
 }
