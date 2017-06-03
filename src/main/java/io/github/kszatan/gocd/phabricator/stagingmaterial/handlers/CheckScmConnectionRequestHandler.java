@@ -33,6 +33,7 @@ import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -55,7 +56,8 @@ public class CheckScmConnectionRequestHandler implements RequestHandler {
             response = DefaultGoPluginApiResponse.success(
                     ScmConnectionResult.success(messages).toJson());
         } else {
-            response = DefaultGoPluginApiResponse.error(ScmConnectionResult.failure(scm.getErrors()).toJson());
+            Collection<String> messages = Collections.singletonList(scm.getLastErrorMessage());
+            response = DefaultGoPluginApiResponse.error(ScmConnectionResult.failure(messages).toJson());
         }
         return response;
     }

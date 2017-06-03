@@ -41,37 +41,40 @@ import java.util.*;
 
 class Git implements Scm {
     private final ScmConfiguration configuration;
-    private List<String> errors;
+    private final JGitWrapper jgitWrapper;
+    private String lastErrorMessage;
 
-    Git(ScmConfiguration configuration) {
+    private static Logger LOGGER = Logger.getLoggerFor(Scm.class);
+
+    Git(ScmConfiguration configuration, JGitWrapper jgitWrapper) {
         this.configuration = configuration;
-        errors = new ArrayList<>();
+        this.jgitWrapper = jgitWrapper;
+        this.lastErrorMessage = "";
     }
 
     @Override
     public Boolean canConnect() {
-        errors.clear();
-        TransportCommand lsRemote = org.eclipse.jgit.api.Git.lsRemoteRepository()
-                .setHeads(true)
-                .setRemote(configuration.url);
-        if (configuration.hasCredentials()) {
-            lsRemote.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.username, configuration.password));
-        }
+        Boolean connected = true;
         try {
-            lsRemote.call();
-        } catch (Exception e) {
-            errors.add(e.getMessage());
+            if (configuration.hasCredentials()) {
+                jgitWrapper.lsRemote(configuration.url, configuration.username, configuration.password);
+            } else {
+                jgitWrapper.lsRemote(configuration.url);
+            }
+        } catch (JGitWrapperException e) {
+            lastErrorMessage = e.getMessage();
+            connected = false;
         }
-        return errors.isEmpty();
+        return connected;
     }
 
     @Override
     public LatestRevisionResult getLatestRevision(String gitDir) {
         return new LatestRevisionResult();
     }
-    
+
     @Override
-    public Collection<String> getErrors() {
-        return errors;
+    public String getLastErrorMessage() {
+        return lastErrorMessage;
     }
 }

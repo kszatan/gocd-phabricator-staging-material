@@ -22,18 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-
-public class ScmFactory {
-    public static Scm create(ScmType scmType, ScmConfiguration configuration) throws UnsupportedScmTypeException {
-        Scm scm;
-        switch (scmType) {
-            case GIT:
-                scm = new Git(configuration, new JGitWrapper());
-                break;
-            default:
-                throw new UnsupportedScmTypeException(scmType);
-        }
-        return scm;
+public class JGitWrapperException extends Exception {
+    public JGitWrapperException(String message) {
+        super(message);
     }
 }

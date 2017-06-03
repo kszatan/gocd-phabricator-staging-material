@@ -45,7 +45,7 @@ public interface Scm {
     LatestRevisionResult getLatestRevision(String workDir);
 
     /**
-     * @return errors returned from the last invoked operation, if any.
+     * @return error returned from the last invoked operation, if any.
      */
-    Collection<String> getErrors();
+    String getLastErrorMessage();
 }

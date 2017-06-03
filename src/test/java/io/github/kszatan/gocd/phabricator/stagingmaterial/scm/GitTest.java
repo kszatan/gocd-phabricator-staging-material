@@ -26,22 +26,52 @@ import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmCon
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class GitTest {
     private ScmConfiguration configuration;
     private Scm scm;
+    private JGitWrapper wrapper;
 
     @Before
     public void setUp() throws Exception {
         configuration = new ScmConfiguration();
         configuration.url = "https://github.com/kszatan/gocd-phabricator-staging-material.git";
-        scm = ScmFactory.create(ScmType.GIT, configuration);
+        wrapper = mock(JGitWrapper.class);
+        scm = new Git(configuration, wrapper);
     }
 
     @Test
-    public void checkConnection() throws Exception {
+    public void checkConnectionShouldReturnTrueInAbsenceOfExceptions() throws Exception {
+        when(wrapper.lsRemote(anyString())).thenReturn(new ArrayList<String>());
         assertTrue(scm.canConnect());
+        verify(wrapper).lsRemote(configuration.url);
+    }
+
+    @Test
+    public void checkConnectionWithCredentialShouldReturnTrueInAbsenceOfExceptions() throws Exception {
+        when(wrapper.lsRemote(anyString(), anyString(), anyString())).thenReturn(new ArrayList<String>());
+        configuration.username = "kszatan";
+        configuration.password = "hunter2";
+        assertTrue(scm.canConnect());
+        verify(wrapper).lsRemote(configuration.url, configuration.username, configuration.password);
+    }
+
+    @Test
+    public void checkConnectionShouldReturnFalseWhenWrapperThrowsException() throws Exception {
+        String message = "What we've got here is failure to communicate";
+        when(wrapper.lsRemote(anyString())).thenThrow(new JGitWrapperException(message));
+        assertFalse(scm.canConnect());
+        verify(wrapper).lsRemote(configuration.url);
+        assertThat(scm.getLastErrorMessage(), equalTo(message));
     }
 
 }
