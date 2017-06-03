@@ -20,10 +20,8 @@
  * SOFTWARE.
  */
 
-package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
+package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidLatestRevisionStringException;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevision;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -31,7 +29,24 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
-public class LatestRevisionRequestHandlerTest {
+public class LatestRevisionTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void constructorShouldParseCorrectJsonString() throws Exception {
+        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{},\"flyweight-folder\":\"/server/pipelines/flyweight/961e6dd6-255a-40ed-8792-1a1477b942d5\"}";
+        LatestRevision latestRevision = new LatestRevision(json);
+        assertThat(latestRevision.configuration.url,
+                equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
+        assertThat(latestRevision.flyweightFolder,
+                equalTo("/server/pipelines/flyweight/961e6dd6-255a-40ed-8792-1a1477b942d5"));
     }
 
+    @Test
+    public void constructorShouldThrowWhenFlyweightFolderEntryIsMissing() throws Exception {
+        thrown.expect(InvalidLatestRevisionStringException.class);
+        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{}}";
+        new LatestRevision(json);
+    }
 }
