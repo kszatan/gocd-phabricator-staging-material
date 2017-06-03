@@ -29,6 +29,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +37,7 @@ public class Revision {
     public RevisionData data;
     public String revisionComment;
     public String revision;
-    public String timestamp;
+    public Date timestamp;
     public String user;
     public List<ModifiedFile> modifiedFiles;
 
@@ -44,7 +45,7 @@ public class Revision {
         data = new RevisionData();
         revisionComment = "";
         revision = "";
-        timestamp = "";
+        timestamp = new Date();
         user = "";
         modifiedFiles = new ArrayList<>();
     }
@@ -60,8 +61,10 @@ public class Revision {
             Type type = new TypeToken<List<ModifiedFile>>() {}.getType();
             modifiedFiles = gson.fromJson(root.getAsJsonArray("modifiedFiles").toString(), type);
         }
+        if (root.has("timestamp")) {
+            timestamp = gson.fromJson(root.getAsJsonObject().get("timestamp").toString(), Date.class);
+        }
         revisionComment = getField(root.getAsJsonObject(), "revisionComment");
-        timestamp = getField(root.getAsJsonObject(), "timestamp");
         revision = getField(root.getAsJsonObject(), "revision");
         user = getField(root.getAsJsonObject(), "user");
     }

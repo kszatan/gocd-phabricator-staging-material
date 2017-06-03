@@ -23,20 +23,11 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
 import com.thoughtworks.go.plugin.api.logging.Logger;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevision;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ModifiedFile;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Revision;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.TransportCommand;
-import org.eclipse.jgit.diff.DiffEntry;
-import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
-import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
-import java.io.File;
 import java.util.*;
 
 class Git implements Scm {
@@ -69,12 +60,46 @@ class Git implements Scm {
     }
 
     @Override
-    public LatestRevisionResult getLatestRevision(String gitDir) {
-        return new LatestRevisionResult();
+    public Optional<LatestRevisionResult> getLatestRevision(String workDirPath) {
+        Revision revision = new Revision();
+        try {
+            Repository repository = jgitWrapper.cloneRepository(configuration, workDirPath);
+            Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
+            Optional<Tag> lastRevisionTag = tagList.stream()
+                    .filter(t -> t.getName().startsWith("refs/tags/phabricator/diff/"))
+                    .sorted(Comparator.comparing(Tag::getName))
+                    .reduce((a, b) -> b);
+            if (lastRevisionTag.isPresent()) {
+                Tag tag = lastRevisionTag.get();
+                revision.revision = tag.getName().replace("refs/tags/phabricator/diff/", "");
+                Collection<Commit> commits = jgitWrapper.log(repository, tag);
+                Commit tip = commits.iterator().next();
+                fillRevisionCommitInfo(revision, tip);
+                Commit tipParent = tip.parent();
+                fillRevisionModifiedFiles(revision, jgitWrapper.diff(repository, tip, tipParent));
+            }
+        } catch (JGitWrapperException e) {
+            lastErrorMessage = e.getMessage();
+            return Optional.empty();
+        }
+        return Optional.of(new LatestRevisionResult(revision));
     }
 
     @Override
     public String getLastErrorMessage() {
         return lastErrorMessage;
+    }
+
+    private void fillRevisionCommitInfo(Revision revision, Commit commit) {
+        revision.revisionComment = commit.comment();
+        revision.timestamp = commit.commitTime();
+        revision.user = commit.author();
+    }
+
+    private void fillRevisionModifiedFiles(Revision revision, Collection<DiffEntry> entries) {
+        for (DiffEntry entry : entries) {
+            ModifiedFile file = new ModifiedFile(entry.path(), entry.action());
+            revision.modifiedFiles.add(file);
+        }
     }
 }

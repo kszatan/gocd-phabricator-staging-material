@@ -23,6 +23,7 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import com.google.gson.Gson;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
 public class LatestRevisionResultTest {
+    @Ignore
     @Test
     public void toJsonShouldIncludeAllMembers() throws Exception {
         Revision revision = new Revision();

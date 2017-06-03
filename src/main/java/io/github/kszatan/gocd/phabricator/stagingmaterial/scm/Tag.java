@@ -22,31 +22,21 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 
-import java.util.Collection;
-import java.util.Optional;
+public class Tag {
+    private final Ref ref;
+    
+    public Tag(Ref ref) {
+        this.ref = ref;
+    }
 
-/**
- * Common interface for classes implementing logic for particular SCMs. So far
- * the only supported SCM is git.
- */
-public interface Scm {
-    /**
-     * Try to connect to a repository.
-     * @return {@code true} if successfully connected, {@code false} otherwise.
-     */
-    Boolean canConnect();
+    public String getName() {
+        return ref.getName();
+    }
 
-    /**
-     * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
-     * @return latest revision info.
-     */
-    Optional<LatestRevisionResult> getLatestRevision(String workDir);
-
-    /**
-     * @return error returned from the last invoked operation, if any.
-     */
-    String getLastErrorMessage();
+    public ObjectId getObjectId() {
+        return ref.getObjectId();
+    }
 }

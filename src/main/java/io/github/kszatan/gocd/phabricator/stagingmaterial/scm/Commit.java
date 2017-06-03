@@ -22,31 +22,40 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevTree;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.sql.Timestamp;
+import java.util.Date;
 
-/**
- * Common interface for classes implementing logic for particular SCMs. So far
- * the only supported SCM is git.
- */
-public interface Scm {
-    /**
-     * Try to connect to a repository.
-     * @return {@code true} if successfully connected, {@code false} otherwise.
-     */
-    Boolean canConnect();
+public class Commit {
+    private final RevCommit commit;
 
-    /**
-     * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
-     * @return latest revision info.
-     */
-    Optional<LatestRevisionResult> getLatestRevision(String workDir);
+    public Commit(RevCommit commit) {
+        this.commit = commit;
+    }
 
-    /**
-     * @return error returned from the last invoked operation, if any.
-     */
-    String getLastErrorMessage();
+    public Commit parent() {
+        return new Commit(commit.getParent(0));
+    }
+
+    public RevTree getTree() {
+        return commit.getTree();
+    }
+
+    public String comment() {
+        return commit.getFullMessage();
+    }
+
+    public Date commitTime() {
+        return commit.getAuthorIdent().getWhen();
+//        Timestamp timestamp = new Timestamp(commit.getCommitTime());
+//        return new Date(timestamp.getTime());
+    }
+
+    public String author() {
+        PersonIdent ident = commit.getAuthorIdent();
+        return ident.getName() + " " + ident.getEmailAddress();
+    }
 }

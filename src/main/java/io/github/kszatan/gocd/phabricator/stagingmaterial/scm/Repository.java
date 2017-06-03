@@ -22,31 +22,14 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+public class Repository {
+    private final org.eclipse.jgit.api.Git git;
+    
+    public Repository(org.eclipse.jgit.api.Git git) {
+        this.git = git;
+    }
 
-import java.util.Collection;
-import java.util.Optional;
-
-/**
- * Common interface for classes implementing logic for particular SCMs. So far
- * the only supported SCM is git.
- */
-public interface Scm {
-    /**
-     * Try to connect to a repository.
-     * @return {@code true} if successfully connected, {@code false} otherwise.
-     */
-    Boolean canConnect();
-
-    /**
-     * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
-     * @return latest revision info.
-     */
-    Optional<LatestRevisionResult> getLatestRevision(String workDir);
-
-    /**
-     * @return error returned from the last invoked operation, if any.
-     */
-    String getLastErrorMessage();
+    public org.eclipse.jgit.api.Git getGit() {
+        return git;
+    }
 }

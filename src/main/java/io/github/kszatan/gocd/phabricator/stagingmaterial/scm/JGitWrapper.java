@@ -22,16 +22,26 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.LsRemoteCommand;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
+import org.eclipse.jgit.api.errors.NoHeadException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
+import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class JGitWrapper {
     public Collection<String> lsRemote(String url) throws JGitWrapperException {
@@ -45,8 +55,53 @@ public class JGitWrapper {
         return call(lsRemote);
     }
 
-    public CloneCommand cloneRepository() {
-        return org.eclipse.jgit.api.Git.cloneRepository();
+    public Repository cloneRepository(ScmConfiguration configuration, String workDirPath) throws JGitWrapperException {
+        CloneCommand command = org.eclipse.jgit.api.Git.cloneRepository()
+                .setBare(true)
+                .setGitDir(new File(workDirPath))
+                .setNoCheckout(true)
+                .setURI(configuration.url);
+        if (configuration.hasCredentials()) {
+            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.username, configuration.password));
+        }
+        return call(command);
+    }
+
+    public Collection<Tag> fetchTags(Repository repository) throws JGitWrapperException {
+        ListTagCommand command = repository.getGit().tagList();
+        Collection<Ref> refs = call(command);
+        return refs.stream().map(r -> new Tag(r)).collect(Collectors.toList());
+    }
+
+    public Collection<Commit> log(Repository repository, Tag tag) throws JGitWrapperException {
+        LogCommand command = repository.getGit().log();
+        try {
+            command.add(tag.getObjectId());
+        } catch (MissingObjectException | IncorrectObjectTypeException e) {
+            throw new JGitWrapperException("JGit was unable to get log: " + e.getMessage());
+        }
+        Iterable<RevCommit> commits = call(command);
+        return StreamSupport.stream(commits.spliterator(), false)
+                .map(c -> new Commit(c))
+                .collect(Collectors.toList());
+    }
+
+    public Collection<DiffEntry> diff(Repository repository, Commit begin, Commit end) throws JGitWrapperException {
+        org.eclipse.jgit.api.Git git = repository.getGit();
+        ObjectReader reader = git.getRepository().newObjectReader();
+        CanonicalTreeParser newTreeIterator;
+        CanonicalTreeParser oldTreeIterator;
+        try {
+            newTreeIterator = new CanonicalTreeParser(null, reader, begin.getTree().getId());
+            oldTreeIterator = new CanonicalTreeParser(null, reader, end.getTree().getId());
+        } catch (Exception e) {
+            throw new JGitWrapperException("Unable to parse commit tree: " + e.getMessage());
+        }
+        DiffCommand command = git.diff()
+                .setNewTree(newTreeIterator)
+                .setOldTree(oldTreeIterator)
+                .setShowNameAndStatusOnly(true);
+        return call(command).stream().map(d -> new DiffEntry(d)).collect(Collectors.toList());
     }
 
     private LsRemoteCommand lsRemoteRepository(String url) {
@@ -67,5 +122,43 @@ public class JGitWrapper {
             throw new JGitWrapperException("General JGit exception: " + e.getMessage());
         }
         return refs.stream().map(Ref::getName).collect(Collectors.toList());
+    }
+
+    private Repository call(CloneCommand command) throws JGitWrapperException {
+        try {
+            return new Repository(command.call());
+        } catch (TransportException e) {
+            throw new JGitWrapperException("Transport layer exception: " + e.getMessage());
+        } catch (InvalidRemoteException e) {
+            throw new JGitWrapperException("Invalid remote: " + e.getMessage());
+        } catch (GitAPIException e) {
+            throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        }
+    }
+
+    private Collection<Ref> call(ListTagCommand command) throws JGitWrapperException {
+        try {
+            return command.call();
+        } catch (GitAPIException e) {
+            throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        }
+    }
+
+    private Iterable<RevCommit> call(LogCommand command) throws JGitWrapperException {
+        try {
+            return command.call();
+        } catch (NoHeadException e) {
+            throw new JGitWrapperException("No HEAD found: " + e.getMessage());
+        } catch (GitAPIException e) {
+            throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        }
+    }
+
+    private Collection<org.eclipse.jgit.diff.DiffEntry> call(DiffCommand command) throws JGitWrapperException {
+        try {
+            return command.call();
+        } catch (GitAPIException e) {
+            throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        }
     }
 }

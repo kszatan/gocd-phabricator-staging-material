@@ -25,10 +25,34 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidLatestRevisionStringException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidScmConfigurationStringException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevision;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
+
+import java.util.Optional;
 
 public class LatestRevisionRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        return DefaultGoPluginApiResponse.error("Not implemented");
+        LatestRevision latestRevision;
+        Scm scm;
+        try {
+            latestRevision = new LatestRevision(request.requestBody());
+            scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
+        } catch (InvalidScmConfigurationStringException
+                | InvalidLatestRevisionStringException
+                | UnsupportedScmTypeException e) {
+            return DefaultGoPluginApiResponse.error(e.getMessage());
+        }
+        Optional<LatestRevisionResult> result = scm.getLatestRevision(latestRevision.flyweightFolder);
+        DefaultGoPluginApiResponse response = result.isPresent() ?
+                DefaultGoPluginApiResponse.success(result.get().toJson()) :
+                DefaultGoPluginApiResponse.error(scm.getLastErrorMessage());
+        return response;
     }
 }

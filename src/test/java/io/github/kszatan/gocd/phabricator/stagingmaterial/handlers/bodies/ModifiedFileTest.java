@@ -37,7 +37,7 @@ public class ModifiedFileTest {
     public void constructorShouldParseCorrectJsonString() throws Exception {
         String json = "{\"fileName\":\"file-1\",\"action\":\"added\"}";
         ModifiedFile modifiedFile = new ModifiedFile(json);
-        assertThat(modifiedFile.fileName, equalTo("file-1"));
+        assertThat(modifiedFile.path, equalTo("file-1"));
         assertThat(modifiedFile.action, equalTo("added"));
     }
 

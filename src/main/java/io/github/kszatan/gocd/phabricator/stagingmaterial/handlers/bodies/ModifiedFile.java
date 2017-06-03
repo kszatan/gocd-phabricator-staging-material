@@ -24,11 +24,18 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.annotations.SerializedName;
 
 public class ModifiedFile {
-    public String fileName;
+    @SerializedName("fileName")
+    public String path;
     public String action;
 
+    public ModifiedFile(String path, String action) {
+        this.path = path;
+        this.action = action;
+    }
+    
     public ModifiedFile(String json) throws InvalidModifiedFileStringException {
         JsonParser parser = new JsonParser();
         JsonObject root = parser.parse(json).getAsJsonObject();
@@ -36,7 +43,7 @@ public class ModifiedFile {
                 || !root.has("action")) {
             throw new InvalidModifiedFileStringException();
         }
-        fileName = root.get("fileName").getAsString();
+        path = root.get("fileName").getAsString();
         action = root.get("action").getAsString();
     }
 }
