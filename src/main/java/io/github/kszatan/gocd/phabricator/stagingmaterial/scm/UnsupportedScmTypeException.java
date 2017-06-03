@@ -22,31 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.*;
-
-public class ScmTest {
-    private ScmConfiguration configuration;
-    private Scm scm;
-    
-    @Before
-    public void setUp() throws Exception {
+public class UnsupportedScmTypeException extends Exception {
+    public UnsupportedScmTypeException(ScmType type) {
+        super ("Unsupported SCM type: " + type.name());
     }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
-    @Test
-    public void checkConnection() throws Exception {
-        configuration = new ScmConfiguration();
-        configuration.url = "https://github.com/kszatan/gocd-phabricator-staging-material.git";
-        scm = new Scm(configuration);
-        assertTrue(scm.canConnect());
-    }
-
 }

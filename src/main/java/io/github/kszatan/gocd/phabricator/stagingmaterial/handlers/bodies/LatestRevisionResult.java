@@ -32,6 +32,13 @@ public class LatestRevisionResult {
     @SerializedName("scm-data")
     public ScmData scmData;
 
+    public LatestRevisionResult() {
+    }
+
+    public LatestRevisionResult(Revision revision) {
+        this.revision = revision;
+    }
+
     public String toJson() {
         Gson gson = new Gson();
         return gson.toJson(this);

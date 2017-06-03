@@ -22,16 +22,6 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidLatestRevisionStringException;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevision;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
-
 public class LatestRevisionRequestHandlerTest {
-    }
 
 }

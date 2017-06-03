@@ -22,30 +22,25 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
-import java.util.Collection;
+import static org.junit.Assert.assertTrue;
 
-/**
- * Common interface for classes implementing logic for particular SCMs. So far
- * the only supported SCM is git.
- */
-public interface Scm {
-    /**
-     * Try to connect to a repository.
-     * @return {@code true} if successfully connected, {@code false} otherwise.
-     */
-    Boolean canConnect();
+public class ScmFactoryTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-    /**
-     * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
-     * @return latest revision info.
-     */
-    LatestRevisionResult getLatestRevision(String workDir);
+    @Test
+    public void shouldCreateGitScmGivenGitType() throws Exception {
+        assertTrue(ScmFactory.create(ScmType.GIT, null) instanceof Git);
+    }
 
-    /**
-     * @return errors returned from the last invoked operation, if any.
-     */
-    Collection<String> getErrors();
+    @Test
+    public void shouldThrowForUnknownScmType() throws Exception {
+        thrown.expect(UnsupportedScmTypeException.class);
+        thrown.expectMessage("Unsupported SCM type: " + ScmType.UNSUPPORTED.name());
+        ScmFactory.create(ScmType.UNSUPPORTED, null);
+    }
 }

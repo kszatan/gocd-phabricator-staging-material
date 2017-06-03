@@ -24,22 +24,22 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import com.google.gson.Gson;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
 
 public class ScmConnectionResult {
     public String status;
-    public List<String> messages;
+    public Collection<String> messages;
 
-    public static ScmConnectionResult success(List<String> messages) {
+    public static ScmConnectionResult success(Collection<String> messages) {
         return create("success", messages);
     }
 
-    public static ScmConnectionResult failure(List<String> messages) {
+    public static ScmConnectionResult failure(Collection<String> messages) {
         return create("failure", messages);
     }
 
-    private static ScmConnectionResult create(String status, List<String> messages) {
+    private static ScmConnectionResult create(String status, Collection<String> messages) {
         ScmConnectionResult result = new ScmConnectionResult();
         result.status = status;
         result.messages = messages;

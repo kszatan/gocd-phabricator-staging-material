@@ -29,6 +29,9 @@ import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Invali
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConnectionResult;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,13 +40,15 @@ public class CheckScmConnectionRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         ScmConfiguration configuration;
+        Scm scm;
         try {
             configuration = new ScmConfiguration(request.requestBody());
-        } catch (InvalidScmConfigurationStringException e) {
+            scm = ScmFactory.create(ScmType.GIT, configuration);
+        } catch (UnsupportedScmTypeException
+                | InvalidScmConfigurationStringException e) {
             return DefaultGoPluginApiResponse.error(
                     ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
         }
-        Scm scm = new Scm(configuration);
         GoPluginApiResponse response;
         if (scm.canConnect()) {
             List<String> messages = Collections.singletonList("Successfully connected to " + configuration.url);

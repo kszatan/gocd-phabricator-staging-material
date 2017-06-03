@@ -22,30 +22,18 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
 
-import java.util.Collection;
-
-/**
- * Common interface for classes implementing logic for particular SCMs. So far
- * the only supported SCM is git.
- */
-public interface Scm {
-    /**
-     * Try to connect to a repository.
-     * @return {@code true} if successfully connected, {@code false} otherwise.
-     */
-    Boolean canConnect();
-
-    /**
-     * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
-     * @return latest revision info.
-     */
-    LatestRevisionResult getLatestRevision(String workDir);
-
-    /**
-     * @return errors returned from the last invoked operation, if any.
-     */
-    Collection<String> getErrors();
+public class ScmFactory {
+    public static Scm create(ScmType scmType, ScmConfiguration configuration) throws UnsupportedScmTypeException {
+        Scm scm;
+        switch (scmType) {
+            case GIT:
+                scm = new Git(configuration);
+                break;
+            default:
+                throw new UnsupportedScmTypeException(scmType);
+        }
+        return scm;
+    }
 }

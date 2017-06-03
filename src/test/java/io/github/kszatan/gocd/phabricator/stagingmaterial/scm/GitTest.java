@@ -22,30 +22,26 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import org.junit.Before;
+import org.junit.Test;
 
-import java.util.Collection;
+import static org.junit.Assert.*;
 
-/**
- * Common interface for classes implementing logic for particular SCMs. So far
- * the only supported SCM is git.
- */
-public interface Scm {
-    /**
-     * Try to connect to a repository.
-     * @return {@code true} if successfully connected, {@code false} otherwise.
-     */
-    Boolean canConnect();
+public class GitTest {
+    private ScmConfiguration configuration;
+    private Scm scm;
 
-    /**
-     * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
-     * @return latest revision info.
-     */
-    LatestRevisionResult getLatestRevision(String workDir);
+    @Before
+    public void setUp() throws Exception {
+        configuration = new ScmConfiguration();
+        configuration.url = "https://github.com/kszatan/gocd-phabricator-staging-material.git";
+        scm = ScmFactory.create(ScmType.GIT, configuration);
+    }
 
-    /**
-     * @return errors returned from the last invoked operation, if any.
-     */
-    Collection<String> getErrors();
+    @Test
+    public void checkConnection() throws Exception {
+        assertTrue(scm.canConnect());
+    }
+
 }

@@ -23,8 +23,10 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,8 +50,11 @@ public class ScmConfigurationValidationResultTest {
         result.errors.add(error);
         String json = result.toJson();
         Gson gson = new Gson();
-        ScmConfigurationValidationResult resultFromJson =
-                gson.fromJson(json, ScmConfigurationValidationResult.class);
+        Type type = new TypeToken<List<ScmConfigurationValidationError>>() {}.getType();
+
+        List<ScmConfigurationValidationError> errors = gson.fromJson(json, type);
+        ScmConfigurationValidationResult resultFromJson = new ScmConfigurationValidationResult();
+        resultFromJson.errors = errors;
         assertThat(resultFromJson, equalTo(result));
     }
 
