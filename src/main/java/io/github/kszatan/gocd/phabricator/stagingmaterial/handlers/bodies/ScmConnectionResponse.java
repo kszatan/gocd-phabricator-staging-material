@@ -50,14 +50,13 @@ public class ScmConnectionResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false; }
-        if (getClass() != o.getClass()) { return false; }
-        ScmConnectionResponse result = (ScmConnectionResponse) o;
-        return Objects.equals(status, result.status)
-                && Objects.equals(messages, result.messages);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScmConnectionResponse that = (ScmConnectionResponse) o;
+        return Objects.equals(status, that.status) &&
+                Objects.equals(messages, that.messages);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(status, messages);

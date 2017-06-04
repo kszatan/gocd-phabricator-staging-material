@@ -52,16 +52,15 @@ public class Revision {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false; }
-        if (getClass() != o.getClass()) { return false; }
-        Revision result = (Revision) o;
-        return Objects.equals(data, result.data)
-                && Objects.equals(revisionComment, result.revisionComment)
-                && Objects.equals(revision, result.revision)
-                && Objects.equals(timestamp, result.timestamp)
-                && Objects.equals(user, result.user)
-                && Objects.equals(modifiedFiles, result.modifiedFiles);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Revision that = (Revision) o;
+        return Objects.equals(data, that.data) &&
+                Objects.equals(revisionComment, that.revisionComment) &&
+                Objects.equals(revision, that.revision) &&
+                Objects.equals(timestamp, that.timestamp) &&
+                Objects.equals(user, that.user) &&
+                Objects.equals(modifiedFiles, that.modifiedFiles);
     }
 
     @Override

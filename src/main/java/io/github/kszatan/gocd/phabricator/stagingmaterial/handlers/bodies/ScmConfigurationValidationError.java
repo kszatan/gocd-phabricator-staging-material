@@ -28,15 +28,13 @@ public class ScmConfigurationValidationError {
     public String key;
     public String message;
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false; }
-        if (getClass() != o.getClass()) { return false; }
-        ScmConfigurationValidationError result = (ScmConfigurationValidationError) o;
-        return Objects.equals(key, result.key)
-                && Objects.equals(message, result.message);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScmConfigurationValidationError that = (ScmConfigurationValidationError) o;
+        return Objects.equals(key, that.key) &&
+                Objects.equals(message, that.message);
     }
 
     @Override

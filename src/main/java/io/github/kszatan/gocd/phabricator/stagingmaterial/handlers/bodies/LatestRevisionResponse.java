@@ -44,12 +44,11 @@ public class LatestRevisionResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false; }
-        if (getClass() != o.getClass()) { return false; }
-        LatestRevisionResponse result = (LatestRevisionResponse) o;
-        return Objects.equals(revision, result.revision)
-                && Objects.equals(scmData, result.scmData);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LatestRevisionResponse that = (LatestRevisionResponse) o;
+        return Objects.equals(revision, that.revision) &&
+                Objects.equals(scmData, that.scmData);
     }
 
     @Override

@@ -34,11 +34,10 @@ public class ScmConfigurationValidationResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false; }
-        if (getClass() != o.getClass()) { return false; }
-        ScmConfigurationValidationResponse result = (ScmConfigurationValidationResponse) o;
-        return Objects.equals(errors, result.errors);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScmConfigurationValidationResponse that = (ScmConfigurationValidationResponse) o;
+        return Objects.equals(errors, that.errors);
     }
 
     @Override
