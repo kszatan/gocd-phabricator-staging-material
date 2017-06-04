@@ -22,8 +22,23 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-public class InvalidLatestRevisionStringException extends Exception {
-    public InvalidLatestRevisionStringException() {
-        super("Invalid JSON of latest-revision request");
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+public class LatestRevisionRequest {
+    private final LatestRevision latestRevision;
+
+    public LatestRevisionRequest(String json) throws InvalidJson {
+        final List<String> requiredFields = Arrays.asList("scm-configuration", "flyweight-folder");
+        Collection<String> missing = GsonService.validate(json, requiredFields);
+        if (!missing.isEmpty()) {
+            throw new InvalidJson("Missing fields: " + missing.toString());
+        }
+        latestRevision = GsonService.fromJson(json, LatestRevision.class);
+    }
+
+    public LatestRevision getLatestRevision() {
+        return latestRevision;
     }
 }

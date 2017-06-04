@@ -31,15 +31,4 @@ public class LatestRevision {
     public ScmConfiguration configuration;
     @SerializedName("flyweight-folder")
     public String flyweightFolder;
-
-    public LatestRevision(String json) throws InvalidLatestRevisionStringException, InvalidJson {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(json).getAsJsonObject();
-        if (!root.has("scm-configuration")
-                || !root.has("flyweight-folder")) {
-            throw new InvalidLatestRevisionStringException();
-        }
-        configuration = new ScmConfigurationRequest(json).getConfiguration();
-        flyweightFolder = root.get("flyweight-folder").getAsString();
-    }
 }

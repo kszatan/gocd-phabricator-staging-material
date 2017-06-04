@@ -25,10 +25,7 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidJson;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidLatestRevisionStringException;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevision;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
@@ -41,14 +38,14 @@ public class LatestRevisionRequestHandler implements RequestHandler {
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         DefaultGoPluginApiResponse response;
         try {
-            LatestRevision latestRevision = new LatestRevision(request.requestBody());
+            LatestRevisionRequest latestRevisionRequest = new LatestRevisionRequest(request.requestBody());
+            LatestRevision latestRevision = latestRevisionRequest.getLatestRevision();
             Scm scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
             Optional<LatestRevisionResult> result = scm.getLatestRevision(latestRevision.flyweightFolder);
             response = result.isPresent() ?
                     DefaultGoPluginApiResponse.success(result.get().toJson()) :
                     DefaultGoPluginApiResponse.error(scm.getLastErrorMessage());
         } catch (InvalidJson
-                | InvalidLatestRevisionStringException
                 | UnsupportedScmTypeException e) {
             response = DefaultGoPluginApiResponse.error(e.getMessage());
         }

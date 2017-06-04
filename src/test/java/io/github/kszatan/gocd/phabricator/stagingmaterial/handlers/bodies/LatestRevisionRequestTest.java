@@ -29,14 +29,15 @@ import org.junit.rules.ExpectedException;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
-public class LatestRevisionTest {
+public class LatestRevisionRequestTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void constructorShouldParseCorrectJsonString() throws Exception {
         String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{},\"flyweight-folder\":\"/server/pipelines/flyweight/961e6dd6-255a-40ed-8792-1a1477b942d5\"}";
-        LatestRevision latestRevision = new LatestRevision(json);
+        LatestRevisionRequest latestRevisionRequest = new LatestRevisionRequest(json);
+        LatestRevision latestRevision = latestRevisionRequest.getLatestRevision();
         assertThat(latestRevision.configuration.getUrl(),
                 equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
         assertThat(latestRevision.flyweightFolder,
@@ -45,8 +46,9 @@ public class LatestRevisionTest {
 
     @Test
     public void constructorShouldThrowWhenFlyweightFolderEntryIsMissing() throws Exception {
-        thrown.expect(InvalidLatestRevisionStringException.class);
+        thrown.expect(InvalidJson.class);
+        thrown.expectMessage("Missing fields: ");
         String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{}}";
-        new LatestRevision(json);
+        new LatestRevisionRequest(json);
     }
 }
