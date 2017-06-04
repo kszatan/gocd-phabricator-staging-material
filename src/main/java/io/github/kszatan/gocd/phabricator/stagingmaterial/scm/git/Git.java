@@ -66,7 +66,7 @@ public class Git implements Scm {
     public Optional<LatestRevisionResponse> getLatestRevision(String workDirPath) {
         Revision revision = new Revision();
         try {
-            Repository repository = jgitWrapper.cloneRepository(configuration, workDirPath);
+            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath);
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
             Optional<Tag> lastRevisionTag = tagList.stream()
                     .filter(t -> t.getName().startsWith("refs/tags/phabricator/diff/"))

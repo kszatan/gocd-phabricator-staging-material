@@ -37,10 +37,13 @@ import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.FetchResult;
+import org.eclipse.jgit.transport.TagOpt;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -67,6 +70,18 @@ public class JGitWrapper {
             command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getUsername(), configuration.getPassword()));
         }
         return call(command);
+    }
+
+    public Repository cloneOrUpdateRepository(ScmConfiguration configuration, String workDirPath) throws JGitWrapperException {
+        org.eclipse.jgit.api.Git git;
+        try {
+            git = org.eclipse.jgit.api.Git.open(new File(workDirPath));
+            FetchCommand command = git.fetch().setTagOpt(TagOpt.FETCH_TAGS);
+            call(command);
+        } catch (IOException e) {
+            return cloneRepository(configuration, workDirPath);
+        }
+        return new Repository(git);
     }
 
     public Collection<Tag> fetchTags(Repository repository) throws JGitWrapperException {
@@ -151,6 +166,18 @@ public class JGitWrapper {
             return command.call();
         } catch (NoHeadException e) {
             throw new JGitWrapperException("No HEAD found: " + e.getMessage());
+        } catch (GitAPIException e) {
+            throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        }
+    }
+
+    private FetchResult call(FetchCommand command) throws JGitWrapperException {
+        try {
+            return command.call();
+        } catch (TransportException e) {
+            throw new JGitWrapperException("Transport layer exception: " + e.getMessage());
+        } catch (InvalidRemoteException e) {
+            throw new JGitWrapperException("Invalid remote: " + e.getMessage());
         } catch (GitAPIException e) {
             throw new JGitWrapperException("General JGit exception: " + e.getMessage());
         }
