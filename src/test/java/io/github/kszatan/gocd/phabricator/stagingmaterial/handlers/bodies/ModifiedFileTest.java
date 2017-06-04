@@ -45,7 +45,7 @@ public class ModifiedFileTest {
 
     @Ignore
     @Test
-    public void constructorShouldThrowAnExceptionGivenInvalidJson() throws Exception {
+    public void constructorShouldThrowGivenInvalidJson() throws Exception {
         thrown.expect(InvalidJson.class);
         thrown.expectMessage("Missing fields: ");
         String json = "{\"scm-view\":2}";
@@ -54,7 +54,7 @@ public class ModifiedFileTest {
 
     @Ignore
     @Test
-    public void constructorShouldThrowAnExceptionWhenFilenameMissing() throws Exception {
+    public void constructorShouldThrowWhenFilenameMissing() throws Exception {
         thrown.expect(InvalidJson.class);
         thrown.expectMessage("Missing fields: ");
         String json = "{\"action\":\"added\"}";
@@ -63,7 +63,7 @@ public class ModifiedFileTest {
 
     @Ignore
     @Test
-    public void constructorShouldThrowAnExceptionWhenActionMissing() throws Exception {
+    public void constructorShouldThrowWhenActionMissing() throws Exception {
         thrown.expect(InvalidJson.class);
         thrown.expectMessage("Missing fields: ");
         String json = "{\"fileName\":\"file-1\"}";

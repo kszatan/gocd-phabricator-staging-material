@@ -74,9 +74,18 @@ public class ScmConfigurationRequestTest {
     }
 
     @Test
-    public void constructorShouldThrowAnExceptionGivenInvalidJson() throws Exception {
+    public void constructorShouldThrowGivenIncompleteJson() throws Exception {
+        thrown.expect(IncompleteJson.class);
+        thrown.expectMessage("Missing fields: ");
+        String json = "{}";
+        new ScmConfigurationRequest(json);
+    }
+
+    @Test
+    public void constructorShouldThrowGivenInvalidJson() throws Exception {
         thrown.expect(InvalidJson.class);
-        String json = "{\"scm-view\":2}";
+        thrown.expectMessage("Malformed JSON: ");
+        String json = "Invalid JSON";
         new ScmConfigurationRequest(json);
     }
 }

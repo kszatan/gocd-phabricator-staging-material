@@ -25,15 +25,13 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidJson;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationRequest;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConnectionResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -57,6 +55,8 @@ public class CheckScmConnectionRequestHandler implements RequestHandler {
         } catch (UnsupportedScmTypeException | InvalidJson e) {
             response = DefaultGoPluginApiResponse.error(
                     ScmConnectionResponse.failure(Collections.singletonList(e.getMessage())).toJson());
+        } catch (IncompleteJson e) {
+            response = DefaultGoPluginApiResponse.incompleteRequest(e.getMessage());
         }
         return response;
     }

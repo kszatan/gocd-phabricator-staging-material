@@ -29,11 +29,11 @@ import java.util.List;
 public class LatestRevisionRequest {
     private final LatestRevision latestRevision;
 
-    public LatestRevisionRequest(String json) throws InvalidJson {
+    public LatestRevisionRequest(String json) throws InvalidJson, IncompleteJson {
         final List<String> requiredFields = Arrays.asList("scm-configuration", "flyweight-folder");
         Collection<String> missing = GsonService.validate(json, requiredFields);
         if (!missing.isEmpty()) {
-            throw new InvalidJson("Missing fields: " + missing.toString());
+            throw new IncompleteJson("Missing fields: " + missing.toString());
         }
         latestRevision = GsonService.fromJson(json, LatestRevision.class);
     }

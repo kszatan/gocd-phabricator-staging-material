@@ -22,22 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-public class ScmConfigurationRequest {
-    private final ScmConfiguration configuration;
-
-    public ScmConfigurationRequest(String json) throws InvalidJson, IncompleteJson {
-        Collection<String> missing = GsonService.validate(json, Arrays.asList("scm-configuration"));
-        if (!missing.isEmpty()) {
-            throw new IncompleteJson("Missing fields: " + missing.toString());
-        }
-        String configurationJson = GsonService.getField(json, "scm-configuration");
-        configuration = GsonService.fromJson(configurationJson, ScmConfiguration.class);
-    }
-
-    public ScmConfiguration getConfiguration() {
-        return configuration;
+public class IncompleteJson extends Exception {
+    public IncompleteJson(String s) {
+        super(s);
     }
 }

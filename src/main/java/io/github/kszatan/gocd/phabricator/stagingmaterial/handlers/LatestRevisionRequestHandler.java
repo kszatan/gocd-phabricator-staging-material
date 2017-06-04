@@ -48,6 +48,8 @@ public class LatestRevisionRequestHandler implements RequestHandler {
         } catch (InvalidJson
                 | UnsupportedScmTypeException e) {
             response = DefaultGoPluginApiResponse.error(e.getMessage());
+        } catch (IncompleteJson e) {
+            response = DefaultGoPluginApiResponse.incompleteRequest(e.getMessage());
         }
         return response;
     }
