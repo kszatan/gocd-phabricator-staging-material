@@ -50,32 +50,6 @@ public class Revision {
         modifiedFiles = new ArrayList<>();
     }
 
-    public Revision(String json) {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(json).getAsJsonObject();
-        Gson gson = new Gson();
-        if (root.has("data")) {
-            data = gson.fromJson(root.getAsJsonObject("data").toString(), RevisionData.class);
-        }
-        if (root.has("modifiedFiles")) {
-            Type type = new TypeToken<List<ModifiedFile>>() {}.getType();
-            modifiedFiles = gson.fromJson(root.getAsJsonArray("modifiedFiles").toString(), type);
-        }
-        if (root.has("timestamp")) {
-            timestamp = gson.fromJson(root.getAsJsonObject().get("timestamp").toString(), Date.class);
-        }
-        revisionComment = getField(root.getAsJsonObject(), "revisionComment");
-        revision = getField(root.getAsJsonObject(), "revision");
-        user = getField(root.getAsJsonObject(), "user");
-    }
-
-    private String getField(JsonObject jsonObject, String field) {
-        if (!jsonObject.has(field)) {
-            return "";
-        }
-        return jsonObject.get(field).getAsString();
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }

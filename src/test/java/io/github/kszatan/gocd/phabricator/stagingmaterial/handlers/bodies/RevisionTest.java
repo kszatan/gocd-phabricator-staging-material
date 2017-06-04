@@ -24,6 +24,8 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import org.junit.Test;
 
+import java.util.Date;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
@@ -31,17 +33,15 @@ public class RevisionTest {
     @Test
     public void constructorShouldParseCorrectJsonString() throws Exception {
         String json = "{\"revision\": \"revision-1\", \"timestamp\": \"2011-07-14T19:43:37.100Z\", \"user\": \"some-user\", \"revisionComment\": \"comment\", \"data\": {}, \"modifiedFiles\": [{\"fileName\": \"file-1\", \"action\": \"added\"} ] }";
-        Revision revision = new Revision(json);
+        Revision revision = GsonService.fromJson(json, Revision.class);
         assertThat(revision.data, equalTo(new RevisionData()));
         assertThat(revision.revisionComment, equalTo("comment"));
         assertThat(revision.revision, equalTo("revision-1"));
-        // TODO: format time
-//        assertThat(revision.timestamp, equalTo("2011-07-14T19:43:37.100Z"));
+        assertThat(revision.timestamp, equalTo(GsonService.fromJson("\"2011-07-14T19:43:37.100Z\"", Date.class)));
         assertThat(revision.user, equalTo("some-user"));
         assertThat(revision.modifiedFiles.size(), equalTo(1));
         ModifiedFile file = revision.modifiedFiles.get(0);
         assertThat(file.path, equalTo("file-1"));
         assertThat(file.action, equalTo("added"));
     }
-
 }
