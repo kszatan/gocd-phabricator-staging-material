@@ -29,7 +29,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
 public class LatestRevisionResponseTest {
-    @Ignore
     @Test
     public void toJsonShouldIncludeAllMembers() throws Exception {
         Revision revision = new Revision();
