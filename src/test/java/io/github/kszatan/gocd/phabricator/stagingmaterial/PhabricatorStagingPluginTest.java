@@ -22,73 +22,67 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial;
 
-import com.thoughtworks.go.plugin.api.GoApplicationAccessor;
 import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.CheckoutRequestHandler;
-import org.junit.Ignore;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
+import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.RequestHandler;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.RequestHandlerFactory;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.core.Is.is;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class PhabricatorStagingPluginTest {
-    @Test
-    public void handleShouldReturnNonNullResponseForScmConfigurationRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "scm-configuration");
-        assertNotNull(plugin.handle(request));
+    private PhabricatorStagingPlugin plugin;
+    private RequestHandlerFactory requestHandlerFactory;
+    private RequestHandler requestHandler;
+    
+    @Before
+    public void setUp() throws Exception {
+        requestHandlerFactory = mock(RequestHandlerFactory.class);
+        plugin = new PhabricatorStagingPlugin(requestHandlerFactory);
+        requestHandler = mock(RequestHandler.class);
     }
 
     @Test
-    public void handleShouldReturnNonNullResponseForScmViewRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "scm-view");
-        assertNotNull(plugin.handle(request));
+    public void handleShouldReturnBadRequestResponseInCaseOfUnhandledRequestTypeException() throws Exception {
+        when(requestHandlerFactory.create(anyString())).thenThrow(UnhandledRequestTypeException.class);
+
+        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "unhandled-request");
+        GoPluginApiResponse response = plugin.handle(request);
+        
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.BAD_REQUEST));
     }
 
     @Test
-    public void handleShouldReturnNonNullResponseForValidateScmConfigurationRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "validate-scm-configuration");
-        request.setRequestBody("{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}");
-        assertNotNull(plugin.handle(request));
+    public void handleShouldReturnErrorResponseInCaseOfUnknownException() throws Exception {
+        when(requestHandlerFactory.create(anyString())).thenThrow(Exception.class);
+
+        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", RequestHandlerFactory.SCM_CONFIGURATION);
+        GoPluginApiResponse response = plugin.handle(request);
+
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
     }
 
     @Test
-    public void handleShouldReturnNonNullResponseForCheckScmConnectionRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "check-scm-connection");
-        request.setRequestBody("{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}");
-        assertNotNull(plugin.handle(request));
-    }
+    public void handleShouldReturnOriginalResponseInAbsenceOfExceptions() throws Exception {
+        GoPluginApiResponse preparedResponse = DefaultGoPluginApiResponse.success("Body");
+        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", RequestHandlerFactory.SCM_CONFIGURATION);
+        when(requestHandler.handle(any(GoPluginApiRequest.class))).thenReturn(preparedResponse);
+        when(requestHandlerFactory.create(anyString())).thenReturn(requestHandler);
 
+        GoPluginApiResponse returnedResponse = plugin.handle(request);
 
-    // TODO: Mock ScmFactory and enable this test
-    @Ignore
-    @Test
-    public void handleShouldReturnNonNullResponseForLatestRevisionRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "latest-revision");
-        request.setRequestBody("{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{},\"flyweight-folder\":\"/server/pipelines/flyweight/961e6dd6-255a-40ed-8792-1a1477b942d5\"}");
-        assertNotNull(plugin.handle(request));
-    }
-
-    @Test
-    public void handleShouldReturnNonNullResponseForLatestRevisionsSinceRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "latest-revisions-since");
-        assertNotNull(plugin.handle(request));
-    }
-
-    @Test
-    public void handleShouldReturnNonNullResponseForCheckoutRequest() throws UnhandledRequestTypeException {
-        PhabricatorStagingPlugin plugin = new PhabricatorStagingPlugin();
-        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "checkout");
-        assertNotNull(plugin.handle(request));
+        assertThat(returnedResponse, equalTo(preparedResponse));
     }
 
     @Test

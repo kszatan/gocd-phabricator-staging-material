@@ -22,23 +22,23 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
-import org.junit.After;
+import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
+import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class LatestRevisionsSinceRequestHandlerTest {
+    private LatestRevisionsSinceRequestHandler handler;
     @Before
     public void setUp() throws Exception {
+        handler = new LatestRevisionsSinceRequestHandler();
     }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
+    
     @Test
-    public void handle() throws Exception {
+    public void handleShouldReturnNonNullResponseForLatestRevisionRequest() {
+        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "latest-revision-since");
+        assertNotNull(handler.handle(request));
     }
-
 }

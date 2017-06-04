@@ -22,14 +22,24 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
-import org.junit.After;
+import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
+import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class CheckoutRequestHandlerTest {
+    private CheckoutRequestHandler handler;
+    @Before
+    public void setUp() throws Exception {
+        handler = new CheckoutRequestHandler();
+    }
+
     @Test
-    public void handle() throws Exception {
+    public void handleShouldReturnNonNullResponseForCheckoutRequest() throws UnhandledRequestTypeException {
+        GoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "checkout");
+        assertNotNull(handler.handle(request));
     }
 }

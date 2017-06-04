@@ -22,15 +22,38 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
+import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
+import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
+import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.PhabricatorStagingPlugin;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
 public class ValidateScmConfigurationRequestHandlerTest {
+    private ValidateScmConfigurationRequestHandler handler;
+    @Before
+    public void setUp() throws Exception {
+        handler = new ValidateScmConfigurationRequestHandler();
+    }
+
     @Test
-    public void handle() throws Exception {
+    public void handleShouldReturnNonNullResponseForValidateScmConfigurationRequest() throws UnhandledRequestTypeException {
+        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "validate-scm-configuration");
+        request.setRequestBody("{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}");
+        assertNotNull(handler.handle(request));
+    }
+
+    @Test
+    public void handleShouldReturnErrorResponseWhenGivenInvalidJson() {
+        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "validate-scm-configuration");
+        request.setRequestBody("Invalid JSON");
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
     }
 
 }
