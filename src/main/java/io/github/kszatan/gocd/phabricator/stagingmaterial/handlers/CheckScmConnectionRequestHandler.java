@@ -41,24 +41,22 @@ import java.util.List;
 public class CheckScmConnectionRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        ScmConfiguration configuration;
-        Scm scm;
-        try {
-            configuration = (new ScmConfigurationRequest(request.requestBody())).getConfiguration();
-            scm = ScmFactory.create(ScmType.GIT, configuration);
-        } catch (UnsupportedScmTypeException
-                | InvalidJson e) {
-            return DefaultGoPluginApiResponse.error(
-                    ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
-        }
         GoPluginApiResponse response;
-        if (scm.canConnect()) {
-            List<String> messages = Collections.singletonList("Successfully connected to " + configuration.getUrl());
-            response = DefaultGoPluginApiResponse.success(
-                    ScmConnectionResult.success(messages).toJson());
-        } else {
-            Collection<String> messages = Collections.singletonList(scm.getLastErrorMessage());
-            response = DefaultGoPluginApiResponse.error(ScmConnectionResult.failure(messages).toJson());
+        try {
+            ScmConfigurationRequest configurationRequest = new ScmConfigurationRequest(request.requestBody());
+            ScmConfiguration configuration = configurationRequest.getConfiguration();
+            Scm scm = ScmFactory.create(ScmType.GIT, configuration);
+            if (scm.canConnect()) {
+                List<String> messages = Collections.singletonList("Successfully connected to " + configuration.getUrl());
+                response = DefaultGoPluginApiResponse.success(
+                        ScmConnectionResult.success(messages).toJson());
+            } else {
+                Collection<String> messages = Collections.singletonList(scm.getLastErrorMessage());
+                response = DefaultGoPluginApiResponse.error(ScmConnectionResult.failure(messages).toJson());
+            }
+        } catch (UnsupportedScmTypeException | InvalidJson e) {
+            response = DefaultGoPluginApiResponse.error(
+                    ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
         }
         return response;
     }

@@ -34,15 +34,17 @@ import java.util.List;
 public class ValidateScmConfigurationRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        ScmConfiguration configuration;
+        GoPluginApiResponse response;
         try {
-            configuration = (new ScmConfigurationRequest(request.requestBody())).getConfiguration();
+            ScmConfigurationRequest configurationRequest = new ScmConfigurationRequest(request.requestBody());
+            ScmConfiguration configuration = configurationRequest.getConfiguration();
+            ConfigurationValidator validator = new ConfigurationValidator();
+            ScmConfigurationValidationResult validationResult = validator.validate(configuration);
+            response = DefaultGoPluginApiResponse.success(validationResult.toJson());
         } catch (InvalidJson e) {
-            return DefaultGoPluginApiResponse.error(
+            response = DefaultGoPluginApiResponse.error(
                     ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
         }
-        ConfigurationValidator validator = new ConfigurationValidator();
-        ScmConfigurationValidationResult validationResult = validator.validate(configuration);
-        return DefaultGoPluginApiResponse.success(validationResult.toJson());
+        return response;
     }
 }

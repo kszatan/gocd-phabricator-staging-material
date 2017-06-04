@@ -39,20 +39,19 @@ import java.util.Optional;
 public class LatestRevisionRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        LatestRevision latestRevision;
-        Scm scm;
+        DefaultGoPluginApiResponse response;
         try {
-            latestRevision = new LatestRevision(request.requestBody());
-            scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
+            LatestRevision latestRevision = new LatestRevision(request.requestBody());
+            Scm scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
+            Optional<LatestRevisionResult> result = scm.getLatestRevision(latestRevision.flyweightFolder);
+            response = result.isPresent() ?
+                    DefaultGoPluginApiResponse.success(result.get().toJson()) :
+                    DefaultGoPluginApiResponse.error(scm.getLastErrorMessage());
         } catch (InvalidJson
                 | InvalidLatestRevisionStringException
                 | UnsupportedScmTypeException e) {
-            return DefaultGoPluginApiResponse.error(e.getMessage());
+            response = DefaultGoPluginApiResponse.error(e.getMessage());
         }
-        Optional<LatestRevisionResult> result = scm.getLatestRevision(latestRevision.flyweightFolder);
-        DefaultGoPluginApiResponse response = result.isPresent() ?
-                DefaultGoPluginApiResponse.success(result.get().toJson()) :
-                DefaultGoPluginApiResponse.error(scm.getLastErrorMessage());
         return response;
     }
 }
