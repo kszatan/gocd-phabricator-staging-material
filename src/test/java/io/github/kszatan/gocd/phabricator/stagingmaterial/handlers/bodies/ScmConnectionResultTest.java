@@ -37,14 +37,6 @@ import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 public class ScmConnectionResultTest {
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
-
     @Test
     public void successShouldReturnScmConnectionResultInstance() throws Exception {
         assertThat(ScmConnectionResult.success(Collections.singletonList("")),
@@ -89,8 +81,7 @@ public class ScmConnectionResultTest {
         List<String> messages = Arrays.asList("first", "second");
         ScmConnectionResult result = ScmConnectionResult.failure(messages);
         String json = result.toJson();
-        Gson gson = new Gson();
-        ScmConnectionResult resultFromJson = gson.fromJson(json, ScmConnectionResult.class);
+        ScmConnectionResult resultFromJson = GsonService.fromJson(json, ScmConnectionResult.class);
         assertThat(resultFromJson, equalTo(result));
     }
 

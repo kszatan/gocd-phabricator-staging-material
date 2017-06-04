@@ -22,16 +22,16 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
-import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.GsonService;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationDefinition;
 
 public class ScmConfigurationRequestHandler implements RequestHandler {
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        Gson gson = new Gson();
-        return DefaultGoPluginApiResponse.success(gson.toJson(new ScmConfigurationDefinition()));
+        return DefaultGoPluginApiResponse.success(
+                GsonService.toJson(new ScmConfigurationDefinition()));
     }
 }

@@ -43,8 +43,7 @@ public class LatestRevisionResultTest {
         result.revision = revision;
         result.scmData = scmData;
         String json = result.toJson();
-        Gson gson = new Gson();
-        LatestRevisionResult resultFromJson = gson.fromJson(json, LatestRevisionResult.class);
+        LatestRevisionResult resultFromJson = GsonService.fromJson(json, LatestRevisionResult.class);
         assertThat(resultFromJson, equalTo(result));
     }
 

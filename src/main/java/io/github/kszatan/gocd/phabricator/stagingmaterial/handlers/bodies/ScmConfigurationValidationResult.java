@@ -22,8 +22,6 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.Gson;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -31,8 +29,7 @@ public class ScmConfigurationValidationResult {
     public List<ScmConfigurationValidationError> errors;
 
     public String toJson() {
-        Gson gson = new Gson();
-        return gson.toJson(errors);
+        return GsonService.toJson(errors);
     }
 
     @Override

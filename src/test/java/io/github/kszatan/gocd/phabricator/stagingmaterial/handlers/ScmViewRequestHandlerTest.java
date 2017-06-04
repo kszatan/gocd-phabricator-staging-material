@@ -26,6 +26,7 @@ import com.google.gson.Gson;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.GsonService;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmView;
 import org.junit.After;
 import org.junit.Before;
@@ -56,8 +57,7 @@ public class ScmViewRequestHandlerTest {
     @Test
     public void handleShouldReturnValidScmView() throws Exception {
         GoPluginApiResponse response = handler.handle(mock(GoPluginApiRequest.class));
-        Gson gson = new Gson();
-        ScmView configuration = gson.fromJson(response.responseBody(), ScmView.class);
+        ScmView configuration = GsonService.fromJson(response.responseBody(), ScmView.class);
         assertThat(configuration.displayValue, notNullValue());
         assertThat(configuration.template, notNullValue());
     }

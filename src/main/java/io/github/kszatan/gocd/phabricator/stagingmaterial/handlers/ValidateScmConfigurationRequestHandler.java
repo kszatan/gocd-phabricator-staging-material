@@ -29,7 +29,6 @@ import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ConfigurationValidator;
 
 import java.util.Collections;
-import java.util.List;
 
 public class ValidateScmConfigurationRequestHandler implements RequestHandler {
     @Override
