@@ -23,6 +23,10 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Commit;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.DiffEntry;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Repository;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Tag;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
@@ -38,8 +42,6 @@ import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 

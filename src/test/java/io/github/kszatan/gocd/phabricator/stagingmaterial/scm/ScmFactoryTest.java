@@ -22,6 +22,7 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Git;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

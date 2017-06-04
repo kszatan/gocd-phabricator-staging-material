@@ -20,9 +20,12 @@
  * SOFTWARE.
  */
 
-package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
+package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapper;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapperException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +34,6 @@ import java.util.ArrayList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

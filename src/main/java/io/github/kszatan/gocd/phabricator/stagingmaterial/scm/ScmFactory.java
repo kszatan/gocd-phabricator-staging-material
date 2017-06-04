@@ -23,6 +23,7 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Git;
 
 public class ScmFactory {
     public static Scm create(ScmType scmType, ScmConfiguration configuration) throws UnsupportedScmTypeException {

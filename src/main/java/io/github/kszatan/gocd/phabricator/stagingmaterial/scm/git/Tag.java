@@ -20,42 +20,23 @@
  * SOFTWARE.
  */
 
-package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
+package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
-import org.eclipse.jgit.lib.PersonIdent;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Ref;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
-public class Commit {
-    private final RevCommit commit;
-
-    public Commit(RevCommit commit) {
-        this.commit = commit;
+public class Tag {
+    private final Ref ref;
+    
+    public Tag(Ref ref) {
+        this.ref = ref;
     }
 
-    public Commit parent() {
-        return new Commit(commit.getParent(0));
+    public String getName() {
+        return ref.getName();
     }
 
-    public RevTree getTree() {
-        return commit.getTree();
-    }
-
-    public String comment() {
-        return commit.getFullMessage();
-    }
-
-    public Date commitTime() {
-        return commit.getAuthorIdent().getWhen();
-//        Timestamp timestamp = new Timestamp(commit.getCommitTime());
-//        return new Date(timestamp.getTime());
-    }
-
-    public String author() {
-        PersonIdent ident = commit.getAuthorIdent();
-        return ident.getName() + " " + ident.getEmailAddress();
+    public ObjectId getObjectId() {
+        return ref.getObjectId();
     }
 }

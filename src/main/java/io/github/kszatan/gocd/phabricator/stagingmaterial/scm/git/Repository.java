@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
+package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 public class Repository {
     private final org.eclipse.jgit.api.Git git;

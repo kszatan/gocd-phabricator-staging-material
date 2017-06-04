@@ -20,24 +20,27 @@
  * SOFTWARE.
  */
 
-package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
+package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import com.thoughtworks.go.plugin.api.logging.Logger;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ModifiedFile;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Revision;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapper;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapperException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 
 import java.util.*;
 
-class Git implements Scm {
+public class Git implements Scm {
     private final ScmConfiguration configuration;
     private final JGitWrapper jgitWrapper;
     private String lastErrorMessage;
 
     private static Logger LOGGER = Logger.getLoggerFor(Scm.class);
 
-    Git(ScmConfiguration configuration, JGitWrapper jgitWrapper) {
+    public Git(ScmConfiguration configuration, JGitWrapper jgitWrapper) {
         this.configuration = configuration;
         this.jgitWrapper = jgitWrapper;
         this.lastErrorMessage = "";
