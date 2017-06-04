@@ -24,14 +24,34 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 
-public interface RequestHandlerFactory {
-    String SCM_CONFIGURATION = "scm-configuration";
-    String SCM_VIEW = "scm-view";
-    String VALIDATE_SCM_CONFIGURATION = "validate-scm-configuration";
-    String CHECK_SCM_CONNECTION = "check-scm-connection";
-    String LATEST_REVISION = "latest-revision";
-    String LATEST_REVISIONS_SINCE = "latest-revisions-since";
-    String CHECKOUT = "checkout";
-
-    RequestHandler create(String requestType) throws UnhandledRequestTypeException;
+public class DefaultRequestHandlerFactory implements  RequestHandlerFactory {
+    public RequestHandler create(String requestType) throws UnhandledRequestTypeException {
+        RequestHandler handler;
+        switch (requestType) {
+            case SCM_CONFIGURATION:
+                handler = new ScmConfigurationRequestHandler();
+                break;
+            case SCM_VIEW:
+                handler = new ScmViewRequestHandler();
+                break;
+            case VALIDATE_SCM_CONFIGURATION:
+                handler = new ValidateScmConfigurationRequestHandler();
+                break;
+            case CHECK_SCM_CONNECTION:
+                handler = new CheckScmConnectionRequestHandler();
+                break;
+            case LATEST_REVISION:
+                handler = new LatestRevisionRequestHandler();
+                break;
+            case LATEST_REVISIONS_SINCE:
+                handler = new LatestRevisionsSinceRequestHandler();
+                break;
+            case CHECKOUT:
+                handler = new CheckoutRequestHandler();
+                break;
+            default:
+                throw new UnhandledRequestTypeException(requestType);
+        }
+        return handler;
+    }
 }

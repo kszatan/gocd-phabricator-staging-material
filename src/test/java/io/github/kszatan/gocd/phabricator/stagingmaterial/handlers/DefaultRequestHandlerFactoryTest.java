@@ -22,51 +22,58 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
-public class RequestHandlerFactoryTest {
+public class DefaultRequestHandlerFactoryTest {
+    private RequestHandlerFactory requestHandlerFactory;
+    @Before
+    public void setUp() {
+        requestHandlerFactory = new DefaultRequestHandlerFactory();
+    }
+
     @Test
     public void shouldCreateRequestHandlerForScmConfigurationRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("scm-configuration");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.SCM_CONFIGURATION);
         assertThat(handler instanceof ScmConfigurationRequestHandler, is(true));
     }
 
     @Test
     public void shouldCreateRequestHandlerForScmViewRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("scm-view");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.SCM_VIEW);
         assertThat(handler instanceof ScmViewRequestHandler, is(true));
     }
 
     @Test
     public void shouldCreateRequestHandlerForValidateScmConfigurationRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("validate-scm-configuration");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.VALIDATE_SCM_CONFIGURATION);
         assertThat(handler instanceof ValidateScmConfigurationRequestHandler, is(true));
     }
 
     @Test
     public void shouldCreateRequestHandlerForCheckScmConnectionRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("check-scm-connection");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.CHECK_SCM_CONNECTION);
         assertThat(handler instanceof CheckScmConnectionRequestHandler, is(true));
     }
 
     @Test
     public void shouldCreateRequestHandlerForLatestRevisionRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("latest-revision");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.LATEST_REVISION);
         assertThat(handler instanceof LatestRevisionRequestHandler, is(true));
     }
 
     @Test
     public void shouldCreateRequestHandlerForLatestRevisionsSinceRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("latest-revisions-since");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.LATEST_REVISIONS_SINCE);
         assertThat(handler instanceof LatestRevisionsSinceRequestHandler, is(true));
     }
 
     @Test
     public void shouldCreateRequestHandlerForCheckoutRequest() throws Exception {
-        RequestHandler handler = RequestHandlerFactory.create("checkout");
+        RequestHandler handler = requestHandlerFactory.create(RequestHandlerFactory.CHECKOUT);
         assertThat(handler instanceof CheckoutRequestHandler, is(true));
     }
 
@@ -74,7 +81,7 @@ public class RequestHandlerFactoryTest {
     public void shouldThrowExceptionForUnknownRequest() throws Exception {
         String request = "unknown-request";
         try {
-            RequestHandlerFactory.create(request);
+            requestHandlerFactory.create(request);
             fail("should have failed");
         } catch (Exception e) {
             assertThat(e.getMessage(), is("This is an invalid request type :" + request));

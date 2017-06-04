@@ -27,6 +27,7 @@ import com.thoughtworks.go.plugin.api.GoPluginIdentifier;
 import com.thoughtworks.go.plugin.api.annotation.Extension;
 import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.*;
 
@@ -37,11 +38,27 @@ import java.util.List;
 public class PhabricatorStagingPlugin extends AbstractGoPlugin {
     private static final String EXTENSION_NAME = "scm";
     private static final List<String> supportedExtensionVersions = Collections.singletonList("1.0");
+    private final RequestHandlerFactory requestHandlerFactory;
+    public PhabricatorStagingPlugin() {
+        requestHandlerFactory = new DefaultRequestHandlerFactory();
+    }
+    
+    public PhabricatorStagingPlugin(RequestHandlerFactory requestHandlerFactory) {
+        this.requestHandlerFactory = requestHandlerFactory;
+    }
 
     @Override
-    public GoPluginApiResponse handle(GoPluginApiRequest request) throws UnhandledRequestTypeException {
-        RequestHandler requestHandler = RequestHandlerFactory.create(request.requestName());
-        return requestHandler.handle(request);
+    public GoPluginApiResponse handle(GoPluginApiRequest request) {
+        GoPluginApiResponse response;
+        try {
+            RequestHandler requestHandler = requestHandlerFactory.create(request.requestName());
+            response = requestHandler.handle(request);
+        } catch (UnhandledRequestTypeException e) {
+            response = DefaultGoPluginApiResponse.badRequest("Invalid request name: " + request.requestName());
+        } catch (Exception e) {
+            response = DefaultGoPluginApiResponse.error("Unknown error during request processing: " + e.getMessage());
+        }
+        return response;
     }
 
     @Override
