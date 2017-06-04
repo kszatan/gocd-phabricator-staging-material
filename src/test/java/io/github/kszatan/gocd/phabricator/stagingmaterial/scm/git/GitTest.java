@@ -46,7 +46,7 @@ public class GitTest {
     @Before
     public void setUp() throws Exception {
         configuration = new ScmConfiguration();
-        configuration.url = "https://github.com/kszatan/gocd-phabricator-staging-material.git";
+        configuration.setUrl("https://github.com/kszatan/gocd-phabricator-staging-material.git");
         wrapper = mock(JGitWrapper.class);
         scm = new Git(configuration, wrapper);
     }
@@ -55,16 +55,19 @@ public class GitTest {
     public void checkConnectionShouldReturnTrueInAbsenceOfExceptions() throws Exception {
         when(wrapper.lsRemote(anyString())).thenReturn(new ArrayList<String>());
         assertTrue(scm.canConnect());
-        verify(wrapper).lsRemote(configuration.url);
+        verify(wrapper).lsRemote(configuration.getUrl());
     }
 
     @Test
     public void checkConnectionWithCredentialShouldReturnTrueInAbsenceOfExceptions() throws Exception {
         when(wrapper.lsRemote(anyString(), anyString(), anyString())).thenReturn(new ArrayList<String>());
-        configuration.username = "kszatan";
-        configuration.password = "hunter2";
+        configuration.setUsername("kszatan");
+        configuration.setPassword("hunter2");
         assertTrue(scm.canConnect());
-        verify(wrapper).lsRemote(configuration.url, configuration.username, configuration.password);
+        verify(wrapper).lsRemote(
+                configuration.getUrl(),
+                configuration.getUsername(),
+                configuration.getPassword());
     }
 
     @Test
@@ -72,7 +75,7 @@ public class GitTest {
         String message = "What we've got here is failure to communicate";
         when(wrapper.lsRemote(anyString())).thenThrow(new JGitWrapperException(message));
         assertFalse(scm.canConnect());
-        verify(wrapper).lsRemote(configuration.url);
+        verify(wrapper).lsRemote(configuration.getUrl());
         assertThat(scm.getLastErrorMessage(), equalTo(message));
     }
 

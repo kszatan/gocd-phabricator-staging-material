@@ -22,24 +22,22 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.annotations.SerializedName;
+import java.util.Arrays;
+import java.util.Collection;
 
-public class LatestRevision {
-    @SerializedName("scm-configuration")
-    public ScmConfiguration configuration;
-    @SerializedName("flyweight-folder")
-    public String flyweightFolder;
+public class ScmConfigurationRequest {
+    private final ScmConfiguration configuration;
 
-    public LatestRevision(String json) throws InvalidLatestRevisionStringException, InvalidJson {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(json).getAsJsonObject();
-        if (!root.has("scm-configuration")
-                || !root.has("flyweight-folder")) {
-            throw new InvalidLatestRevisionStringException();
+    public ScmConfigurationRequest(String json) throws InvalidJson {
+        Collection<String> missing = GsonService.validate(json, Arrays.asList("scm-configuration"));
+        if (!missing.isEmpty()) {
+            throw new InvalidJson("Missing fields: " + missing.toString());
         }
-        configuration = new ScmConfigurationRequest(json).getConfiguration();
-        flyweightFolder = root.get("flyweight-folder").getAsString();
+        String configurationJson = GsonService.getField(json, "scm-configuration");
+        configuration = GsonService.fromJson(configurationJson, ScmConfiguration.class);
+    }
+
+    public ScmConfiguration getConfiguration() {
+        return configuration;
     }
 }

@@ -51,9 +51,9 @@ public class Git implements Scm {
         Boolean connected = true;
         try {
             if (configuration.hasCredentials()) {
-                jgitWrapper.lsRemote(configuration.url, configuration.username, configuration.password);
+                jgitWrapper.lsRemote(configuration.getUrl(), configuration.getUsername(), configuration.getPassword());
             } else {
-                jgitWrapper.lsRemote(configuration.url);
+                jgitWrapper.lsRemote(configuration.getUrl());
             }
         } catch (JGitWrapperException e) {
             lastErrorMessage = e.getMessage();

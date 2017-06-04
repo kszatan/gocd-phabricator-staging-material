@@ -25,8 +25,9 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidScmConfigurationStringException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidJson;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationRequest;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConnectionResult;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
@@ -43,16 +44,16 @@ public class CheckScmConnectionRequestHandler implements RequestHandler {
         ScmConfiguration configuration;
         Scm scm;
         try {
-            configuration = new ScmConfiguration(request.requestBody());
+            configuration = (new ScmConfigurationRequest(request.requestBody())).getConfiguration();
             scm = ScmFactory.create(ScmType.GIT, configuration);
         } catch (UnsupportedScmTypeException
-                | InvalidScmConfigurationStringException e) {
+                | InvalidJson e) {
             return DefaultGoPluginApiResponse.error(
                     ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
         }
         GoPluginApiResponse response;
         if (scm.canConnect()) {
-            List<String> messages = Collections.singletonList("Successfully connected to " + configuration.url);
+            List<String> messages = Collections.singletonList("Successfully connected to " + configuration.getUrl());
             response = DefaultGoPluginApiResponse.success(
                     ScmConnectionResult.success(messages).toJson());
         } else {

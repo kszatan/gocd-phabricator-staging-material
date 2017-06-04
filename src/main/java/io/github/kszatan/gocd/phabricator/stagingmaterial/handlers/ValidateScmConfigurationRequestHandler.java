@@ -36,8 +36,8 @@ public class ValidateScmConfigurationRequestHandler implements RequestHandler {
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         ScmConfiguration configuration;
         try {
-            configuration = new ScmConfiguration(request.requestBody());
-        } catch (InvalidScmConfigurationStringException e) {
+            configuration = (new ScmConfigurationRequest(request.requestBody())).getConfiguration();
+        } catch (InvalidJson e) {
             return DefaultGoPluginApiResponse.error(
                     ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
         }

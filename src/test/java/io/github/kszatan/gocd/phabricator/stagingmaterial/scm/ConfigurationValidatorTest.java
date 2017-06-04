@@ -74,7 +74,7 @@ public class ConfigurationValidatorTest {
     public void validateShouldWorkForRemoteUrls() throws Exception {
         ConfigurationValidator validator = new ConfigurationValidator();
         ScmConfiguration configuration = new ScmConfiguration();
-        configuration.url = url;
+        configuration.setUrl(url);
         assertThat(validator.validate(configuration).errors.isEmpty(), is(true));
     }
 

@@ -52,4 +52,11 @@ public class GsonServiceTest {
         List<String> requiredFields = Arrays.asList("revision", "timestamp", "user", "data", "modifiedFiles");
         assertThat(GsonService.validate(json, requiredFields).isEmpty(), is(true));
     }
+
+    @Test
+    public void getFieldShouldReturnJsonPartForGivenField() {
+        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"repourl\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}";
+        String configurationJson = GsonService.getField(json, "scm-configuration");
+        assertThat(configurationJson, equalTo("{\"url\":{\"value\":\"repourl\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}"));
+    }
 }

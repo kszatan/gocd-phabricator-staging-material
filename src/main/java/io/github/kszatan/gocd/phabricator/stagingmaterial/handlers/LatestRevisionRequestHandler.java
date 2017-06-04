@@ -25,8 +25,8 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidJson;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidLatestRevisionStringException;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.InvalidScmConfigurationStringException;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevision;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
@@ -44,7 +44,7 @@ public class LatestRevisionRequestHandler implements RequestHandler {
         try {
             latestRevision = new LatestRevision(request.requestBody());
             scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
-        } catch (InvalidScmConfigurationStringException
+        } catch (InvalidJson
                 | InvalidLatestRevisionStringException
                 | UnsupportedScmTypeException e) {
             return DefaultGoPluginApiResponse.error(e.getMessage());

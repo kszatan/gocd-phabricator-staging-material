@@ -22,8 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-public class InvalidScmConfigurationStringException extends Exception {
-    public InvalidScmConfigurationStringException() {
-        super("Invalid JSON of scm-configuration request");
+public class InvalidJson extends Exception {
+    public InvalidJson(String s) {
+        super(s);
     }
 }

@@ -37,7 +37,7 @@ public class LatestRevisionTest {
     public void constructorShouldParseCorrectJsonString() throws Exception {
         String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{},\"flyweight-folder\":\"/server/pipelines/flyweight/961e6dd6-255a-40ed-8792-1a1477b942d5\"}";
         LatestRevision latestRevision = new LatestRevision(json);
-        assertThat(latestRevision.configuration.url,
+        assertThat(latestRevision.configuration.getUrl(),
                 equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
         assertThat(latestRevision.flyweightFolder,
                 equalTo("/server/pipelines/flyweight/961e6dd6-255a-40ed-8792-1a1477b942d5"));

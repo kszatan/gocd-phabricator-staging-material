@@ -22,41 +22,45 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-
 public class ScmConfiguration {
-    public String url;
-    public String username;
-    public String password;
+    public class Entry {
+        private String value = "";
+    }
+    private Entry url;
+    private Entry username;
+    private Entry password;
 
     public ScmConfiguration() {
-        url = "";
-        username = "";
-        password = "";
+        url = new Entry();
+        username = new Entry();
+        password = new Entry();
     }
 
-    public ScmConfiguration(String json) throws InvalidScmConfigurationStringException {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(json).getAsJsonObject();
-        if (!root.has("scm-configuration")) {
-            throw new InvalidScmConfigurationStringException();
-        }
-        JsonObject configuration = root.get("scm-configuration").getAsJsonObject();
-
-        url = getField(configuration, "url");
-        username = getField(configuration, "username");
-        password = getField(configuration, "password");
+    public String getUrl() {
+        return url.value;
     }
-    
+
+    public String getUsername() {
+        return username.value;
+    }
+
+    public String getPassword() {
+        return password.value;
+    }
+
+    public void setUrl(String url) {
+        this.url.value = url;
+    }
+
+    public void setUsername(String username) {
+        this.username.value = username;
+    }
+
+    public void setPassword(String password) {
+        this.password.value = password;
+    }
+
     public boolean hasCredentials() {
-        return !username.isEmpty() && !password.isEmpty();
-    }
-
-    private String getField(JsonObject jsonObject, String field) {
-        if (!jsonObject.has(field)) {
-            return "";
-        }
-        return jsonObject.get(field).getAsJsonObject().get("value").getAsString();
+        return !username.value.isEmpty() && !password.value.isEmpty();
     }
 }

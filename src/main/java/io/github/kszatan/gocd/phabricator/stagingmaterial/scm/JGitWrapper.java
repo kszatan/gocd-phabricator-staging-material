@@ -62,9 +62,9 @@ public class JGitWrapper {
                 .setBare(true)
                 .setGitDir(new File(workDirPath))
                 .setNoCheckout(true)
-                .setURI(configuration.url);
+                .setURI(configuration.getUrl());
         if (configuration.hasCredentials()) {
-            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.username, configuration.password));
+            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getUsername(), configuration.getPassword()));
         }
         return call(command);
     }

@@ -38,7 +38,7 @@ public class ConfigurationValidator {
     public ScmConfigurationValidationResult validate(ScmConfiguration configuration) {
         ScmConfigurationValidationResult result = new ScmConfigurationValidationResult();
         result.errors = new ArrayList<>();
-        result.errors.addAll(validateUrl(configuration.url));
+        result.errors.addAll(validateUrl(configuration.getUrl()));
         return result;
     }
 

@@ -43,6 +43,12 @@ public class GsonService {
         }
         return missing;
     }
+
+    public static String getField(String json, String fieldName) {
+        JsonParser parser = new JsonParser();
+        JsonObject root = parser.parse(json).getAsJsonObject();
+        return root.get(fieldName).toString();
+    }
     
     public static String toJson(Object object) {
         return (new GsonBuilder())

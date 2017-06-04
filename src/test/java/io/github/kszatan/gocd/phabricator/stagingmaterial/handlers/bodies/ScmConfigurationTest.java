@@ -22,57 +22,37 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 public class ScmConfigurationTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-    
     @Test
-    public void constructorShouldParseCorrectJsonString() throws Exception {
-        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}";
-        ScmConfiguration configuration = new ScmConfiguration(json);
-        assertThat(configuration.url, equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
-        assertThat(configuration.username, equalTo("kszatan"));
-        assertThat(configuration.password, equalTo("hunter2"));
+    public void hasCredentialsReturnsTrueWhenUsernameAndPasswordArePresent() {
+        ScmConfiguration configuration = new ScmConfiguration();
+        configuration.setUsername("kszatan");
+        configuration.setPassword("hunter2");
+        assertThat(configuration.hasCredentials(), is(true));
     }
 
     @Test
-    public void constructorShouldAcceptMissingUrlField() throws Exception {
-        String json = "{\"scm-configuration\":{\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}";
-        ScmConfiguration configuration = new ScmConfiguration(json);
-        assertThat(configuration.url, equalTo(""));
-        assertThat(configuration.username, equalTo("kszatan"));
-        assertThat(configuration.password, equalTo("hunter2"));
+    public void hasCredentialsReturnsFalseWhenUsernameIsMissingAndPasswordIsPresent() {
+        ScmConfiguration configuration = new ScmConfiguration();
+        configuration.setPassword("hunter2");
+        assertThat(configuration.hasCredentials(), is(false));
     }
 
     @Test
-    public void constructorShouldAcceptMissingUserField() throws Exception {
-        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"password\":{\"value\":\"hunter2\"}}}";
-        ScmConfiguration configuration = new ScmConfiguration(json);
-        assertThat(configuration.url, equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
-        assertThat(configuration.username, equalTo(""));
-        assertThat(configuration.password, equalTo("hunter2"));
+    public void hasCredentialsReturnsFalseWhenUsernameIsPresentAndPasswordIsMissing() {
+        ScmConfiguration configuration = new ScmConfiguration();
+        configuration.setUsername("kszatan");
+        assertThat(configuration.hasCredentials(), is(false));
     }
 
     @Test
-    public void constructorShouldAcceptMissingPasswordField() throws Exception {
-        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"},\"username\":{\"value\":\"kszatan\"}}}";
-        ScmConfiguration configuration = new ScmConfiguration(json);
-        assertThat(configuration.url, equalTo("https://github.com/kszatan/gocd-phabricator-staging-material.git"));
-        assertThat(configuration.username, equalTo("kszatan"));
-        assertThat(configuration.password, equalTo(""));
-    }
-
-    @Test
-    public void constructorShouldThrowAnExceptionGivenInvalidJson() throws Exception {
-        thrown.expect(InvalidScmConfigurationStringException.class);
-        String json = "{\"scm-view\":2}";
-        new ScmConfiguration(json);
+    public void hasCredentialsReturnsFalseWhenUsernameAndPasswordAreMissing() {
+        ScmConfiguration configuration = new ScmConfiguration();
+        assertThat(configuration.hasCredentials(), is(false));
     }
 }
