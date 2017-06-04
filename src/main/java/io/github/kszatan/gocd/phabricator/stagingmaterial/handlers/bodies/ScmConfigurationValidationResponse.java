@@ -22,32 +22,14 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.Gson;
-
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
-public class ScmConnectionResult {
-    public String status;
-    public Collection<String> messages;
-
-    public static ScmConnectionResult success(Collection<String> messages) {
-        return create("success", messages);
-    }
-
-    public static ScmConnectionResult failure(Collection<String> messages) {
-        return create("failure", messages);
-    }
-
-    private static ScmConnectionResult create(String status, Collection<String> messages) {
-        ScmConnectionResult result = new ScmConnectionResult();
-        result.status = status;
-        result.messages = messages;
-        return result;
-    }
+public class ScmConfigurationValidationResponse {
+    public List<ScmConfigurationValidationError> errors;
 
     public String toJson() {
-        return GsonService.toJson(this);
+        return GsonService.toJson(errors);
     }
 
     @Override
@@ -55,13 +37,12 @@ public class ScmConnectionResult {
         if (this == o) { return true; }
         if (o == null) { return false; }
         if (getClass() != o.getClass()) { return false; }
-        ScmConnectionResult result = (ScmConnectionResult) o;
-        return Objects.equals(status, result.status)
-                && Objects.equals(messages, result.messages);
+        ScmConfigurationValidationResponse result = (ScmConfigurationValidationResponse) o;
+        return Objects.equals(errors, result.errors);
     }
-    
+
     @Override
     public int hashCode() {
-        return Objects.hash(status, messages);
+        return Objects.hash(errors);
     }
 }

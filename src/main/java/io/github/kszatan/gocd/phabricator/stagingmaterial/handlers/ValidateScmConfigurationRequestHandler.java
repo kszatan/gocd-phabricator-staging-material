@@ -38,11 +38,11 @@ public class ValidateScmConfigurationRequestHandler implements RequestHandler {
             ScmConfigurationRequest configurationRequest = new ScmConfigurationRequest(request.requestBody());
             ScmConfiguration configuration = configurationRequest.getConfiguration();
             ConfigurationValidator validator = new ConfigurationValidator();
-            ScmConfigurationValidationResult validationResult = validator.validate(configuration);
+            ScmConfigurationValidationResponse validationResult = validator.validate(configuration);
             response = DefaultGoPluginApiResponse.success(validationResult.toJson());
         } catch (InvalidJson e) {
             response = DefaultGoPluginApiResponse.error(
-                    ScmConnectionResult.failure(Collections.singletonList(e.getMessage())).toJson());
+                    ScmConnectionResponse.failure(Collections.singletonList(e.getMessage())).toJson());
         }
         return response;
     }

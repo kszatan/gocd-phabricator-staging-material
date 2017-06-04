@@ -23,7 +23,7 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import com.thoughtworks.go.plugin.api.logging.Logger;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ModifiedFile;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Revision;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
@@ -63,7 +63,7 @@ public class Git implements Scm {
     }
 
     @Override
-    public Optional<LatestRevisionResult> getLatestRevision(String workDirPath) {
+    public Optional<LatestRevisionResponse> getLatestRevision(String workDirPath) {
         Revision revision = new Revision();
         try {
             Repository repository = jgitWrapper.cloneRepository(configuration, workDirPath);
@@ -85,7 +85,7 @@ public class Git implements Scm {
             lastErrorMessage = e.getMessage();
             return Optional.empty();
         }
-        return Optional.of(new LatestRevisionResult(revision));
+        return Optional.of(new LatestRevisionResponse(revision));
     }
 
     @Override

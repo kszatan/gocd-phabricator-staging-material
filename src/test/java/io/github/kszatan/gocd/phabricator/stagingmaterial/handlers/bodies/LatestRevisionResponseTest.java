@@ -22,27 +22,25 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import java.util.List;
-import java.util.Objects;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class ScmConfigurationValidationResult {
-    public List<ScmConfigurationValidationError> errors;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.*;
 
-    public String toJson() {
-        return GsonService.toJson(errors);
+public class LatestRevisionResponseTest {
+    @Ignore
+    @Test
+    public void toJsonShouldIncludeAllMembers() throws Exception {
+        Revision revision = new Revision();
+        ScmData scmData = new ScmData();
+
+        LatestRevisionResponse result = new LatestRevisionResponse();
+        result.revision = revision;
+        result.scmData = scmData;
+        String json = result.toJson();
+        LatestRevisionResponse resultFromJson = GsonService.fromJson(json, LatestRevisionResponse.class);
+        assertThat(resultFromJson, equalTo(result));
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null) { return false; }
-        if (getClass() != o.getClass()) { return false; }
-        ScmConfigurationValidationResult result = (ScmConfigurationValidationResult) o;
-        return Objects.equals(errors, result.errors);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(errors);
-    }
 }

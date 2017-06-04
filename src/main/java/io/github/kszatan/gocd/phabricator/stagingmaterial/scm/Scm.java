@@ -22,9 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResponse;
 
-import java.util.Collection;
 import java.util.Optional;
 
 /**
@@ -43,7 +42,7 @@ public interface Scm {
      * @param workDir Path to a directory SCM can use for this operation.
      * @return latest revision info.
      */
-    Optional<LatestRevisionResult> getLatestRevision(String workDir);
+    Optional<LatestRevisionResponse> getLatestRevision(String workDir);
 
     /**
      * @return error returned from the last invoked operation, if any.

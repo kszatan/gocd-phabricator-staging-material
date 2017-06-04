@@ -24,7 +24,7 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationValidationError;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationValidationResult;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfigurationValidationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +35,8 @@ public class ConfigurationValidator {
             "((git|ssh|http(s)?)|(\\w+@[\\w\\.]+))(:(//)?)([\\w\\.@\\:/\\-~]+)(/)?";
     public static final Pattern pattern = Pattern.compile(GIT_REMOTE_URL_REGEX);
 
-    public ScmConfigurationValidationResult validate(ScmConfiguration configuration) {
-        ScmConfigurationValidationResult result = new ScmConfigurationValidationResult();
+    public ScmConfigurationValidationResponse validate(ScmConfiguration configuration) {
+        ScmConfigurationValidationResponse result = new ScmConfigurationValidationResponse();
         result.errors = new ArrayList<>();
         result.errors.addAll(validateUrl(configuration.getUrl()));
         return result;

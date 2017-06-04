@@ -22,21 +22,26 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.Gson;
-import com.google.gson.annotations.SerializedName;
-
+import java.util.Collection;
 import java.util.Objects;
 
-public class LatestRevisionResult {
-    public Revision revision;
-    @SerializedName("scm-data")
-    public ScmData scmData;
+public class ScmConnectionResponse {
+    public String status;
+    public Collection<String> messages;
 
-    public LatestRevisionResult() {
+    public static ScmConnectionResponse success(Collection<String> messages) {
+        return create("success", messages);
     }
 
-    public LatestRevisionResult(Revision revision) {
-        this.revision = revision;
+    public static ScmConnectionResponse failure(Collection<String> messages) {
+        return create("failure", messages);
+    }
+
+    private static ScmConnectionResponse create(String status, Collection<String> messages) {
+        ScmConnectionResponse result = new ScmConnectionResponse();
+        result.status = status;
+        result.messages = messages;
+        return result;
     }
 
     public String toJson() {
@@ -48,13 +53,13 @@ public class LatestRevisionResult {
         if (this == o) { return true; }
         if (o == null) { return false; }
         if (getClass() != o.getClass()) { return false; }
-        LatestRevisionResult result = (LatestRevisionResult) o;
-        return Objects.equals(revision, result.revision)
-                && Objects.equals(scmData, result.scmData);
+        ScmConnectionResponse result = (ScmConnectionResponse) o;
+        return Objects.equals(status, result.status)
+                && Objects.equals(messages, result.messages);
     }
-
+    
     @Override
     public int hashCode() {
-        return Objects.hash(revision, scmData);
+        return Objects.hash(status, messages);
     }
 }

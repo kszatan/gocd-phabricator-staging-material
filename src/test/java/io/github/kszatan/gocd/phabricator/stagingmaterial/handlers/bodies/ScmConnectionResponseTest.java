@@ -22,12 +22,8 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.*;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -36,35 +32,35 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
-public class ScmConnectionResultTest {
+public class ScmConnectionResponseTest {
     @Test
     public void successShouldReturnScmConnectionResultInstance() throws Exception {
-        assertThat(ScmConnectionResult.success(Collections.singletonList("")),
-                instanceOf(ScmConnectionResult.class));
+        assertThat(ScmConnectionResponse.success(Collections.singletonList("")),
+                instanceOf(ScmConnectionResponse.class));
     }
 
     @Test
     public void successShouldSetCorrectStatus() throws Exception {
-        ScmConnectionResult result = ScmConnectionResult.success(Collections.singletonList(""));
+        ScmConnectionResponse result = ScmConnectionResponse.success(Collections.singletonList(""));
         assertThat(result.status, equalTo("success"));
     }
 
     @Test
     public void successShouldSetCorrectMessagesList() throws Exception {
         List<String> messages = Arrays.asList("first", "second");
-        ScmConnectionResult result = ScmConnectionResult.success(messages);
+        ScmConnectionResponse result = ScmConnectionResponse.success(messages);
         assertThat(result.messages, equalTo(messages));
     }
 
     @Test
     public void failureShouldReturnScmConnectionResultInstance() throws Exception {
-        assertThat(ScmConnectionResult.failure(Collections.singletonList("")),
-                instanceOf(ScmConnectionResult.class));
+        assertThat(ScmConnectionResponse.failure(Collections.singletonList("")),
+                instanceOf(ScmConnectionResponse.class));
     }
 
     @Test
     public void failureShouldSetCorrectStatus() throws Exception {
-        ScmConnectionResult result = ScmConnectionResult.failure(Collections.singletonList(""));
+        ScmConnectionResponse result = ScmConnectionResponse.failure(Collections.singletonList(""));
         assertThat(result.status, equalTo("failure"));
     }
 
@@ -72,16 +68,16 @@ public class ScmConnectionResultTest {
     @Test
     public void failureShouldSetCorrectMessagesList() throws Exception {
         List<String> messages = Arrays.asList("first", "second");
-        ScmConnectionResult result = ScmConnectionResult.failure(messages);
+        ScmConnectionResponse result = ScmConnectionResponse.failure(messages);
         assertThat(result.messages, equalTo(messages));
     }
 
     @Test
     public void toJsonShouldIncludeStatusAndMessages() throws Exception {
         List<String> messages = Arrays.asList("first", "second");
-        ScmConnectionResult result = ScmConnectionResult.failure(messages);
+        ScmConnectionResponse result = ScmConnectionResponse.failure(messages);
         String json = result.toJson();
-        ScmConnectionResult resultFromJson = GsonService.fromJson(json, ScmConnectionResult.class);
+        ScmConnectionResponse resultFromJson = GsonService.fromJson(json, ScmConnectionResponse.class);
         assertThat(resultFromJson, equalTo(result));
     }
 

@@ -22,29 +22,38 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.Gson;
-import org.junit.Ignore;
-import org.junit.Test;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+public class LatestRevisionResponse {
+    public Revision revision;
+    @SerializedName("scm-data")
+    public ScmData scmData;
 
-public class LatestRevisionResultTest {
-    @Ignore
-    @Test
-    public void toJsonShouldIncludeAllMembers() throws Exception {
-        Revision revision = new Revision();
-        ScmData scmData = new ScmData();
-
-        LatestRevisionResult result = new LatestRevisionResult();
-        result.revision = revision;
-        result.scmData = scmData;
-        String json = result.toJson();
-        LatestRevisionResult resultFromJson = GsonService.fromJson(json, LatestRevisionResult.class);
-        assertThat(resultFromJson, equalTo(result));
+    public LatestRevisionResponse() {
     }
 
+    public LatestRevisionResponse(Revision revision) {
+        this.revision = revision;
+    }
+
+    public String toJson() {
+        return GsonService.toJson(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null) { return false; }
+        if (getClass() != o.getClass()) { return false; }
+        LatestRevisionResponse result = (LatestRevisionResponse) o;
+        return Objects.equals(revision, result.revision)
+                && Objects.equals(scmData, result.scmData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(revision, scmData);
+    }
 }

@@ -28,17 +28,16 @@ import org.junit.Test;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
-public class ScmConfigurationValidationResultTest {
+public class ScmConfigurationValidationResponseTest {
 
     @Test
     public void toJsonShouldIncludeAllErrors() throws Exception {
-        ScmConfigurationValidationResult result = new ScmConfigurationValidationResult();
+        ScmConfigurationValidationResponse result = new ScmConfigurationValidationResponse();
         ScmConfigurationValidationError error = new ScmConfigurationValidationError();
         result.errors = new ArrayList<>();
         error.key = "Key1";
@@ -53,7 +52,7 @@ public class ScmConfigurationValidationResultTest {
         Type type = new TypeToken<List<ScmConfigurationValidationError>>() {}.getType();
 
         List<ScmConfigurationValidationError> errors = gson.fromJson(json, type);
-        ScmConfigurationValidationResult resultFromJson = new ScmConfigurationValidationResult();
+        ScmConfigurationValidationResponse resultFromJson = new ScmConfigurationValidationResponse();
         resultFromJson.errors = errors;
         assertThat(resultFromJson, equalTo(result));
     }

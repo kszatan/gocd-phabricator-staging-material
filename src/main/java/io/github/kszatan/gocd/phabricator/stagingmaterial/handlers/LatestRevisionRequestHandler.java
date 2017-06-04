@@ -41,7 +41,7 @@ public class LatestRevisionRequestHandler implements RequestHandler {
             LatestRevisionRequest latestRevisionRequest = new LatestRevisionRequest(request.requestBody());
             LatestRevision latestRevision = latestRevisionRequest.getLatestRevision();
             Scm scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
-            Optional<LatestRevisionResult> result = scm.getLatestRevision(latestRevision.flyweightFolder);
+            Optional<LatestRevisionResponse> result = scm.getLatestRevision(latestRevision.flyweightFolder);
             response = result.isPresent() ?
                     DefaultGoPluginApiResponse.success(result.get().toJson()) :
                     DefaultGoPluginApiResponse.error(scm.getLastErrorMessage());
