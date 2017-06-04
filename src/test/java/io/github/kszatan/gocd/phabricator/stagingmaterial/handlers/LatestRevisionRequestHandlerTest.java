@@ -22,25 +22,113 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
-import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
-import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
+import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Optional;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LatestRevisionRequestHandlerTest {
+    static private final String validRequestBody = "{\"scm-configuration\":{\"url\":{\"value\":\"git@server:repo.git\"}},\"scm-data\":{},\"flyweight-folder\":\"/var/repo\"}";
+    static private final DefaultGoPluginApiRequest validRequest = new DefaultGoPluginApiRequest("scm", "1.0", "latest-revision");
+    private ScmFactory scmFactory;
+    private Scm scm;
     private LatestRevisionRequestHandler handler;
+
+    public LatestRevisionRequestHandlerTest() {
+        validRequest.setRequestBody(validRequestBody);
+    }
+
     @Before
     public void setUp() throws Exception {
-        handler = new LatestRevisionRequestHandler();
+        scmFactory = mock(ScmFactory.class);
+        handler = new LatestRevisionRequestHandler(scmFactory);
     }
 
     @Test
-    public void handleShouldReturnNonNullResponseForLatestRevisionRequest() {
-        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "latest-revision");
-        assertNotNull(handler.handle(request));
+    public void handleShouldReturnNonNullResponseForLatestRevisionRequest() throws Exception {
+        scm = mock(Scm.class);
+        when(scm.getLatestRevision(any())).thenReturn(Optional.empty());
+        when(scmFactory.create(any(), any())).thenReturn(scm);
+        assertNotNull(handler.handle(validRequest));
+    }
+
+    @Test
+    public void handleShouldReturnErrorResponseGivenInvalidJson() {
+        DefaultGoPluginApiRequest request = validRequest;
+        request.setRequestBody("Invalid JSON");
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
+    }
+    
+    @Test
+    public void handleShouldReturnErrorResponseGivenEmptyRequestBody() {
+        DefaultGoPluginApiRequest request = validRequest;
+        request.setRequestBody(null);
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
+    }
+
+    @Test
+    public void handleShouldReturnIncompleteRequestResponseOnMissingScmConfigurationField() {
+        String missingScmConfigurationJson = "{\"flyweight-folder\":\"/tmp/repo\"}";
+        DefaultGoPluginApiRequest request = validRequest;
+        request.setRequestBody(missingScmConfigurationJson);
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.VALIDATION_FAILED));
+    }
+
+    @Test
+    public void handleShouldReturnIncompleteRequestResponseOnMissingFlyweightFolderField() {
+        String missingFlyweightFolderJson = "{\"scm-configuration\":{\"url\":{\"value\":\"git@den:wiki.git\"}},\"scm-data\":{}}";
+        DefaultGoPluginApiRequest request = validRequest;
+        request.setRequestBody(missingFlyweightFolderJson);
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.VALIDATION_FAILED));
+    }
+
+    @Test
+    public void handleShouldReturnErrorResponseGivenUnsupportedScm() throws Exception {
+        when(scmFactory.create(any(), any())).thenThrow(UnsupportedScmTypeException.class);
+        GoPluginApiResponse response = handler.handle(validRequest);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
+    }
+
+    @Test
+    public void handleShouldReturnSuccessResponseWhenLatestRevisionObjectPresent() throws Exception {
+        scm = mock(Scm.class);
+        Optional<LatestRevisionResponse> preparedResult = Optional.of(new LatestRevisionResponse());
+        when(scm.getLatestRevision(any())).thenReturn(preparedResult);
+        when(scmFactory.create(any(), any())).thenReturn(scm);
+
+        GoPluginApiResponse response = handler.handle(validRequest);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.SUCCESS_RESPONSE_CODE));
+    }
+
+    @Test
+    public void handleShouldReturnCorrectErrorResponseWhenLatestRevisionObjectMissing() throws Exception {
+        scm = mock(Scm.class);
+        String errorMessage = "CHECK ENGINE!";
+        when(scm.getLatestRevision(any())).thenReturn(Optional.empty());
+        when(scm.getLastErrorMessage()).thenReturn(errorMessage);
+        when(scmFactory.create(any(), any())).thenReturn(scm);
+
+        GoPluginApiResponse response = handler.handle(validRequest);
+        
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
+        assertThat(response.responseBody(), equalTo(errorMessage));
     }
 }

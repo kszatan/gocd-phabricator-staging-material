@@ -26,21 +26,18 @@ import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.DefaultScmFactory;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.*;
 
 import java.util.Optional;
 
 public class LatestRevisionRequestHandler implements RequestHandler {
-    private final DefaultScmFactory scmFactory;
+    private final ScmFactory scmFactory;
 
     public LatestRevisionRequestHandler() {
         scmFactory = new DefaultScmFactory();
     }
 
-    public LatestRevisionRequestHandler(DefaultScmFactory scmFactory) {
+    public LatestRevisionRequestHandler(ScmFactory scmFactory) {
         this.scmFactory = scmFactory;
     }
     
