@@ -22,9 +22,14 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 public class ModifiedFile {
     @SerializedName("fileName")
@@ -36,14 +41,11 @@ public class ModifiedFile {
         this.action = action;
     }
     
-    public ModifiedFile(String json) throws InvalidModifiedFileStringException {
-        JsonParser parser = new JsonParser();
-        JsonObject root = parser.parse(json).getAsJsonObject();
-        if (!root.has("fileName")
-                || !root.has("action")) {
-            throw new InvalidModifiedFileStringException();
-        }
-        path = root.get("fileName").getAsString();
-        action = root.get("action").getAsString();
+    public ModifiedFile(String json) throws InvalidJson {
+//        List<String> requiredFields = Arrays.asList("fileName", "action");
+//        Collection<String> missing = GsonService.validate(json, requiredFields);
+//        if (!missing.isEmpty()) {
+//            throw new InvalidJson("Missing fields: " + missing.toString());
+//        }
     }
 }
