@@ -27,20 +27,30 @@ import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.DefaultScmFactory;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
 
 import java.util.Optional;
 
 public class LatestRevisionRequestHandler implements RequestHandler {
+    private final DefaultScmFactory scmFactory;
+
+    public LatestRevisionRequestHandler() {
+        scmFactory = new DefaultScmFactory();
+    }
+
+    public LatestRevisionRequestHandler(DefaultScmFactory scmFactory) {
+        this.scmFactory = scmFactory;
+    }
+    
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         DefaultGoPluginApiResponse response;
         try {
             LatestRevisionRequest latestRevisionRequest = new LatestRevisionRequest(request.requestBody());
             LatestRevision latestRevision = latestRevisionRequest.getLatestRevision();
-            Scm scm = ScmFactory.create(ScmType.GIT, latestRevision.configuration);
+            Scm scm = scmFactory.create(ScmType.GIT, latestRevision.configuration);
             Optional<LatestRevisionResponse> result = scm.getLatestRevision(latestRevision.flyweightFolder);
             response = result.isPresent() ?
                     DefaultGoPluginApiResponse.success(result.get().toJson()) :

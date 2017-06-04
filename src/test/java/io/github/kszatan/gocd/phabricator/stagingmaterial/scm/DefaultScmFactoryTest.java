@@ -29,19 +29,21 @@ import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertTrue;
 
-public class ScmFactoryTest {
+public class DefaultScmFactoryTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void shouldCreateGitScmGivenGitType() throws Exception {
-        assertTrue(ScmFactory.create(ScmType.GIT, null) instanceof Git);
+        ScmFactory factory = new DefaultScmFactory();
+        assertTrue(factory.create(ScmType.GIT, null) instanceof Git);
     }
 
     @Test
     public void shouldThrowForUnknownScmType() throws Exception {
         thrown.expect(UnsupportedScmTypeException.class);
         thrown.expectMessage("Unsupported SCM type: " + ScmType.UNSUPPORTED.name());
-        ScmFactory.create(ScmType.UNSUPPORTED, null);
+        ScmFactory factory = new DefaultScmFactory();
+        factory.create(ScmType.UNSUPPORTED, null);
     }
 }

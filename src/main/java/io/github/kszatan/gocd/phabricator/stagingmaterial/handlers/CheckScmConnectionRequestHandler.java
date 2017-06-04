@@ -27,23 +27,32 @@ import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.DefaultScmFactory;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class CheckScmConnectionRequestHandler implements RequestHandler {
+    private final DefaultScmFactory scmFactory;
+
+    public CheckScmConnectionRequestHandler() {
+        scmFactory = new DefaultScmFactory();
+    }
+
+    public CheckScmConnectionRequestHandler(DefaultScmFactory scmFactory) {
+        this.scmFactory = scmFactory;
+    }
+    
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         GoPluginApiResponse response;
         try {
             ScmConfigurationRequest configurationRequest = new ScmConfigurationRequest(request.requestBody());
             ScmConfiguration configuration = configurationRequest.getConfiguration();
-            Scm scm = ScmFactory.create(ScmType.GIT, configuration);
+            Scm scm = scmFactory.create(ScmType.GIT, configuration);
             if (scm.canConnect()) {
                 List<String> messages = Collections.singletonList("Successfully connected to " + configuration.getUrl());
                 response = DefaultGoPluginApiResponse.success(
