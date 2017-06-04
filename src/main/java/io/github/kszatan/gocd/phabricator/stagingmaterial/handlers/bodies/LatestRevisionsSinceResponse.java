@@ -24,18 +24,19 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
 import java.util.Objects;
 
-public class LatestRevisionResponse {
-    public Revision revision;
-    
+public class LatestRevisionsSinceResponse {
+    public List<Revision> revisions;
+
     @SerializedName("scm-data")
     public ScmData scmData;
 
-    public LatestRevisionResponse() {}
+    public LatestRevisionsSinceResponse() {}
 
-    public LatestRevisionResponse(Revision revision) {
-        this.revision = revision;
+    public LatestRevisionsSinceResponse(List<Revision> revisions) {
+        this.revisions = revisions;
     }
 
     public String toJson() {
@@ -46,13 +47,13 @@ public class LatestRevisionResponse {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LatestRevisionResponse that = (LatestRevisionResponse) o;
-        return Objects.equals(revision, that.revision) &&
+        LatestRevisionsSinceResponse that = (LatestRevisionsSinceResponse) o;
+        return Objects.equals(revisions, that.revisions) &&
                 Objects.equals(scmData, that.scmData);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(revision, scmData);
+        return Objects.hash(revisions, scmData);
     }
 }

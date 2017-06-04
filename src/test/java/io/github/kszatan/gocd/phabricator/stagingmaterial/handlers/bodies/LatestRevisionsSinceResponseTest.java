@@ -22,37 +22,25 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.annotations.SerializedName;
+import org.junit.Test;
 
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.List;
 
-public class LatestRevisionResponse {
-    public Revision revision;
-    
-    @SerializedName("scm-data")
-    public ScmData scmData;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.*;
 
-    public LatestRevisionResponse() {}
+public class LatestRevisionsSinceResponseTest {
+    @Test
+    public void toJsonShouldIncludeAllMembers() throws Exception {
+        List<Revision> revisions = Arrays.asList(new Revision(), new Revision());
+        ScmData scmData = new ScmData();
 
-    public LatestRevisionResponse(Revision revision) {
-        this.revision = revision;
-    }
-
-    public String toJson() {
-        return GsonService.toJson(this);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LatestRevisionResponse that = (LatestRevisionResponse) o;
-        return Objects.equals(revision, that.revision) &&
-                Objects.equals(scmData, that.scmData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(revision, scmData);
+        LatestRevisionsSinceResponse result = new LatestRevisionsSinceResponse();
+        result.revisions = revisions;
+        result.scmData = scmData;
+        String json = result.toJson();
+        LatestRevisionsSinceResponse resultFromJson = GsonService.fromJson(json, LatestRevisionsSinceResponse.class);
+        assertThat(resultFromJson, equalTo(result));
     }
 }
