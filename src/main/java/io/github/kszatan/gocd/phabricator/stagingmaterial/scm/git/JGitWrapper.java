@@ -20,13 +20,9 @@
  * SOFTWARE.
  */
 
-package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
+package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Commit;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.DiffEntry;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Repository;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Tag;
 import org.eclipse.jgit.api.*;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;

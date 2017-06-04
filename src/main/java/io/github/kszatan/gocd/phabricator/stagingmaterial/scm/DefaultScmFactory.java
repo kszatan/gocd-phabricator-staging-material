@@ -24,6 +24,7 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.Git;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git.JGitWrapper;
 
 public class DefaultScmFactory implements ScmFactory {
     @Override

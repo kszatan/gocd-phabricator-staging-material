@@ -27,8 +27,6 @@ import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Latest
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ModifiedFile;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Revision;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapper;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapperException;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 
 import java.util.*;

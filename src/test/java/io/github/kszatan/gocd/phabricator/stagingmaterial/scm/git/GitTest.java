@@ -23,8 +23,6 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapper;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.JGitWrapperException;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 import org.junit.Before;
 import org.junit.Test;
