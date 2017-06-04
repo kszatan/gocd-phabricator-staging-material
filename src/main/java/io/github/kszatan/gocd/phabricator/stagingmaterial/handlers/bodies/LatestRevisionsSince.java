@@ -22,22 +22,18 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+public class LatestRevisionsSince {
+    @SerializedName("scm-configuration")
+    public ScmConfiguration configuration;
+    
+    @SerializedName("flyweight-folder")
+    public String flyweightFolder;
 
-public class ModifiedFile {
-    @SerializedName("fileName")
-    public String path;
-    public String action;
+    @SerializedName("scm-data")
+    public ScmData scmData;
 
-    public ModifiedFile(String path, String action) {
-        this.path = path;
-        this.action = action;
-    }
+    @SerializedName("previous-revision")
+    public Revision previousRevision;
 }

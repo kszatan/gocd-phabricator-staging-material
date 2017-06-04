@@ -22,22 +22,24 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.annotations.SerializedName;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public class ModifiedFile {
-    @SerializedName("fileName")
-    public String path;
-    public String action;
+public class LatestRevisionsSinceRequest {
+    private final LatestRevisionsSince latestRevisionsSince;
 
-    public ModifiedFile(String path, String action) {
-        this.path = path;
-        this.action = action;
+    public LatestRevisionsSinceRequest(String json) throws InvalidJson, IncompleteJson {
+        final List<String> requiredFields =
+                Arrays.asList("scm-configuration", "flyweight-folder", "previous-revision");
+        Collection<String> missing = GsonService.validate(json, requiredFields);
+        if (!missing.isEmpty()) {
+            throw new IncompleteJson("Missing fields: " + missing.toString());
+        }
+        latestRevisionsSince = GsonService.fromJson(json, LatestRevisionsSince.class);
+    }
+
+    public LatestRevisionsSince getLatestRevisionsSince() {
+        return latestRevisionsSince;
     }
 }

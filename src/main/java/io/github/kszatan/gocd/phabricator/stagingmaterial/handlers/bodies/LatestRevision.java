@@ -29,6 +29,7 @@ import com.google.gson.annotations.SerializedName;
 public class LatestRevision {
     @SerializedName("scm-configuration")
     public ScmConfiguration configuration;
+
     @SerializedName("flyweight-folder")
     public String flyweightFolder;
 }
