@@ -26,23 +26,20 @@ import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.DefaultScmFactory;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmType;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.*;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class CheckScmConnectionRequestHandler implements RequestHandler {
-    private final DefaultScmFactory scmFactory;
+    private final ScmFactory scmFactory;
 
     public CheckScmConnectionRequestHandler() {
         scmFactory = new DefaultScmFactory();
     }
 
-    public CheckScmConnectionRequestHandler(DefaultScmFactory scmFactory) {
+    public CheckScmConnectionRequestHandler(ScmFactory scmFactory) {
         this.scmFactory = scmFactory;
     }
     

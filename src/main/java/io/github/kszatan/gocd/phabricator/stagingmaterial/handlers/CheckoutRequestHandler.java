@@ -25,10 +25,47 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.*;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 public class CheckoutRequestHandler implements RequestHandler {
+    private final ScmFactory scmFactory;
+
+    public CheckoutRequestHandler() {
+        scmFactory = new DefaultScmFactory();
+    }
+
+    public CheckoutRequestHandler(ScmFactory scmFactory) {
+        this.scmFactory = scmFactory;
+    }
+    
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        return DefaultGoPluginApiResponse.error("Not implemented");
+        GoPluginApiResponse response;
+        try {
+            CheckoutRequest checkoutRequest = new CheckoutRequest(request.requestBody());
+            Checkout checkout = checkoutRequest.getCheckout();
+            ScmConfiguration configuration = checkout.configuration;
+            Scm scm = scmFactory.create(ScmType.GIT, configuration);
+            if (scm.checkout(checkout.revision, checkout.destinationFolder)) {
+                String message = "Successfully checked out revision " + checkout.revision.revision;
+                List<String> messages = Collections.singletonList(message);
+                response = DefaultGoPluginApiResponse.success(
+                        CheckoutResponse.success(messages).toJson());
+            } else {
+                Collection<String> messages = Collections.singletonList(scm.getLastErrorMessage());
+                response = DefaultGoPluginApiResponse.error(CheckoutResponse.failure(messages).toJson());
+            }
+        } catch (UnsupportedScmTypeException | InvalidJson e) {
+            response = DefaultGoPluginApiResponse.error(
+                    CheckoutResponse.failure(Collections.singletonList(e.getMessage())).toJson());
+        } catch (IncompleteJson e) {
+            response = DefaultGoPluginApiResponse.incompleteRequest(e.getMessage());
+        }
+        return response;
     }
 }

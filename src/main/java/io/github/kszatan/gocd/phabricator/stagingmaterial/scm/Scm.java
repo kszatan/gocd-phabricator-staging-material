@@ -55,6 +55,14 @@ public interface Scm {
     Optional<LatestRevisionsSinceResponse> getLatestRevisionsSince(String workDirPath, Revision latestRevision);
 
     /**
+     * Checkout revision to checkoutDirPath directory.
+     * @param revision Revision to checkout.
+     * @param checkoutDirPath Path to checkout directory.
+     * @return {@code true} if successfully checked out, {@code false} otherwise.
+     */
+    Boolean checkout(Revision revision, String checkoutDirPath);
+
+    /**
      * @return error returned from the last invoked operation, if any.
      */
     String getLastErrorMessage();

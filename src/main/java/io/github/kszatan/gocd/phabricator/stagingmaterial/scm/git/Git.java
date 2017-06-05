@@ -117,6 +117,11 @@ public class Git implements Scm {
     }
 
     @Override
+    public Boolean checkout(Revision revision, String checkoutDirPath) {
+        return null;
+    }
+
+    @Override
     public String getLastErrorMessage() {
         return lastErrorMessage;
     }
