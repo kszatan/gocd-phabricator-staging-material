@@ -78,9 +78,9 @@ public class LatestRevisionsSinceRequestTest {
 
     @Test
     public void constructorShouldThrowGivenInvalidJson() throws Exception {
-        thrown.expect(IncompleteJson.class);
-        thrown.expectMessage("Missing fields: ");
-        String json = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"scm-data\":{}}";
+        thrown.expect(InvalidJson.class);
+        thrown.expectMessage("Malformed JSON: ");
+        String json = "Invalid JSON";
         new LatestRevisionsSinceRequest(json);
     }
 }
