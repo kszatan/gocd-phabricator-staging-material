@@ -23,6 +23,8 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionsSinceResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Revision;
 
 import java.util.Optional;
 
@@ -39,10 +41,18 @@ public interface Scm {
 
     /**
      * Enquire repository of latest revision info.
-     * @param workDir Path to a directory SCM can use for this operation.
+     * @param workDirPath Path to a directory SCM can use for this operation.
      * @return latest revision info.
      */
-    Optional<LatestRevisionResponse> getLatestRevision(String workDir);
+    Optional<LatestRevisionResponse> getLatestRevision(String workDirPath);
+
+    /**
+     * Enquire repository of latest revisions info.
+     * @param workDirPath Path to a directory SCM can use for this operation.
+     * @param latestRevision Latest known revision.
+     * @return latest revision info.
+     */
+    Optional<LatestRevisionsSinceResponse> getLatestRevisionsSince(String workDirPath, Revision latestRevision);
 
     /**
      * @return error returned from the last invoked operation, if any.

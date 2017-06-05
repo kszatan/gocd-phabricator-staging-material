@@ -23,13 +23,11 @@
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import com.thoughtworks.go.plugin.api.logging.Logger;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionResponse;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ModifiedFile;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.Revision;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Git implements Scm {
     private final ScmConfiguration configuration;
@@ -84,6 +82,38 @@ public class Git implements Scm {
             return Optional.empty();
         }
         return Optional.of(new LatestRevisionResponse(revision));
+    }
+
+    @Override
+    public Optional<LatestRevisionsSinceResponse> getLatestRevisionsSince(String workDirPath, Revision latestRevision) {
+        ArrayList<Revision> revisions = new ArrayList<>();
+        try {
+            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath);
+            Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
+            Integer latestRevisionNum = Integer.valueOf(latestRevision.revision);
+            List<Tag> latestTags = tagList.stream()
+                    .filter(t -> t.getName().startsWith("refs/tags/phabricator/diff/"))
+                    .filter(t -> {
+                        String rev = t.getName().replace("refs/tags/phabricator/diff/", "");
+                        return Integer.valueOf(rev) > latestRevisionNum;
+                    })
+                    .sorted(Comparator.comparing(Tag::getName))
+                    .collect(Collectors.toList());
+            for (Tag tag : latestTags) {
+                Revision revision = new Revision();
+                revision.revision = tag.getName().replace("refs/tags/phabricator/diff/", "");
+                Collection<Commit> commits = jgitWrapper.log(repository, tag);
+                Commit tip = commits.iterator().next();
+                fillRevisionCommitInfo(revision, tip);
+                Commit tipParent = tip.parent();
+                fillRevisionModifiedFiles(revision, jgitWrapper.diff(repository, tip, tipParent));
+                revisions.add(revision);
+            }
+        } catch (JGitWrapperException e) {
+            lastErrorMessage = e.getMessage();
+            return Optional.empty();
+        }
+        return Optional.of(new LatestRevisionsSinceResponse(revisions));
     }
 
     @Override
