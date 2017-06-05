@@ -25,10 +25,41 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.GoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.*;
+
+import java.util.Optional;
 
 public class LatestRevisionsSinceRequestHandler implements RequestHandler {
+    private final ScmFactory scmFactory;
+
+    public LatestRevisionsSinceRequestHandler() {
+        scmFactory = new DefaultScmFactory();
+    }
+
+    public LatestRevisionsSinceRequestHandler(ScmFactory scmFactory) {
+        this.scmFactory = scmFactory;
+    }
+    
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
-        return DefaultGoPluginApiResponse.error("Not implemented");
+        DefaultGoPluginApiResponse response;
+        try {
+            LatestRevisionsSinceRequest latestRevisionsSinceRequest =
+                    new LatestRevisionsSinceRequest(request.requestBody());
+            LatestRevisionsSince latestRevision = latestRevisionsSinceRequest.getLatestRevisionsSince();
+            Scm scm = scmFactory.create(ScmType.GIT, latestRevision.configuration);
+            Optional<LatestRevisionsSinceResponse> result =
+                    scm.getLatestRevisionsSince(latestRevision.flyweightFolder, latestRevision.previousRevision);
+            response = result.isPresent() ?
+                    DefaultGoPluginApiResponse.success(result.get().toJson()) :
+                    DefaultGoPluginApiResponse.error(scm.getLastErrorMessage());
+        } catch (InvalidJson
+                | UnsupportedScmTypeException e) {
+            response = DefaultGoPluginApiResponse.error(e.getMessage());
+        } catch (IncompleteJson e) {
+            response = DefaultGoPluginApiResponse.incompleteRequest(e.getMessage());
+        }
+        return response;
     }
 }
