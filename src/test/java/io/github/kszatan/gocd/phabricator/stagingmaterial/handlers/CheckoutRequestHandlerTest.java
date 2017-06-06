@@ -25,7 +25,6 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
-import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.LatestRevisionsSinceResponse;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.ScmFactory;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.UnsupportedScmTypeException;
@@ -35,7 +34,6 @@ import org.junit.Test;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -43,7 +41,7 @@ import static org.mockito.Mockito.when;
 
 public class CheckoutRequestHandlerTest {
     static private final String validRequestBody = "{\"scm-configuration\":{\"url\":{\"value\":\"https://github.com/kszatan/gocd-phabricator-staging-material.git\"}},\"destination-folder\":\"/var/lib/go-agent/pipelines/pipeline-name/destination\",\"revision\": {\"revision\": \"revision-1\",\"timestamp\": \"2011-07-14T19:43:37.100Z\",\"data\":{}}}";
-    static private final DefaultGoPluginApiRequest validRequest = new DefaultGoPluginApiRequest("scm", "1.0", "latest-revision");
+    static private final DefaultGoPluginApiRequest validRequest = new DefaultGoPluginApiRequest("scm", "1.0", "checkout");
     private ScmFactory scmFactory;
     private Scm scm;
     private CheckoutRequestHandler handler;
