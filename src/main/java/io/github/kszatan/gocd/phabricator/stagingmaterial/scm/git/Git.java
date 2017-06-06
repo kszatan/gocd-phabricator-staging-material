@@ -34,8 +34,6 @@ public class Git implements Scm {
     private final JGitWrapper jgitWrapper;
     private String lastErrorMessage;
 
-    private static Logger LOGGER = Logger.getLoggerFor(Scm.class);
-
     public Git(ScmConfiguration configuration, JGitWrapper jgitWrapper) {
         this.configuration = configuration;
         this.jgitWrapper = jgitWrapper;
@@ -62,7 +60,7 @@ public class Git implements Scm {
     public Optional<LatestRevisionResponse> getLatestRevision(String workDirPath) {
         Revision revision = new Revision();
         try {
-            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath);
+            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath, true);
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
             Optional<Tag> lastRevisionTag = tagList.stream()
                     .filter(t -> t.getName().startsWith("refs/tags/phabricator/diff/"))
@@ -88,7 +86,7 @@ public class Git implements Scm {
     public Optional<LatestRevisionsSinceResponse> getLatestRevisionsSince(String workDirPath, Revision latestRevision) {
         ArrayList<Revision> revisions = new ArrayList<>();
         try {
-            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath);
+            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath, true);
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
             Integer latestRevisionNum = Integer.valueOf(latestRevision.revision);
             List<Tag> latestTags = tagList.stream()
@@ -118,7 +116,14 @@ public class Git implements Scm {
 
     @Override
     public Boolean checkout(Revision revision, String checkoutDirPath) {
-        return null;
+        try {
+            Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, checkoutDirPath, false);
+            jgitWrapper.checkout(repository, "refs/tags/phabricator/diff/" + revision.revision);
+            return true;
+        } catch (JGitWrapperException e) {
+            lastErrorMessage = e.getMessage();
+            return false;
+        }
     }
 
     @Override

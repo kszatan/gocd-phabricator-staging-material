@@ -24,10 +24,7 @@ package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConfiguration;
 import org.eclipse.jgit.api.*;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.eclipse.jgit.api.errors.NoHeadException;
-import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectReader;
@@ -56,9 +53,9 @@ public class JGitWrapper {
         return call(lsRemote);
     }
 
-    public Repository cloneRepository(ScmConfiguration configuration, String workDirPath) throws JGitWrapperException {
+    public Repository cloneRepository(ScmConfiguration configuration, String workDirPath, Boolean bare) throws JGitWrapperException {
         CloneCommand command = org.eclipse.jgit.api.Git.cloneRepository()
-                .setBare(true)
+                .setBare(bare)
                 .setNoCheckout(true)
                 .setDirectory(new File(workDirPath))
                 .setURI(configuration.getUrl());
@@ -68,14 +65,14 @@ public class JGitWrapper {
         return call(command);
     }
 
-    public Repository cloneOrUpdateRepository(ScmConfiguration configuration, String workDirPath) throws JGitWrapperException {
+    public Repository cloneOrUpdateRepository(ScmConfiguration configuration, String workDirPath, Boolean bare) throws JGitWrapperException {
         org.eclipse.jgit.api.Git git;
         try {
             git = org.eclipse.jgit.api.Git.open(new File(workDirPath));
             FetchCommand command = git.fetch().setTagOpt(TagOpt.FETCH_TAGS);
             call(command);
         } catch (IOException e) {
-            return cloneRepository(configuration, workDirPath);
+            return cloneRepository(configuration, workDirPath, bare);
         }
         return new Repository(git);
     }
@@ -121,6 +118,13 @@ public class JGitWrapper {
         return org.eclipse.jgit.api.Git.lsRemoteRepository()
                 .setHeads(true)
                 .setRemote(url);
+    }
+
+    public Boolean checkout(Repository repository, String tagName) throws JGitWrapperException {
+            org.eclipse.jgit.api.Git git = repository.getGit();
+            CheckoutCommand checkoutCommand = git.checkout().setName(tagName);
+            call(checkoutCommand);
+            return checkoutCommand.getResult().getStatus() == CheckoutResult.Status.OK;
     }
 
     private Collection<String> call(LsRemoteCommand command) throws JGitWrapperException {
@@ -182,6 +186,22 @@ public class JGitWrapper {
     private Collection<org.eclipse.jgit.diff.DiffEntry> call(DiffCommand command) throws JGitWrapperException {
         try {
             return command.call();
+        } catch (GitAPIException e) {
+            throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        }
+    }
+
+    private void call(CheckoutCommand command) throws JGitWrapperException {
+        try {
+            command.call();
+        } catch (RefAlreadyExistsException e) {
+            throw new JGitWrapperException("Tried to create existing ref: " + e.getMessage());
+        } catch (RefNotFoundException e) {
+            throw new JGitWrapperException("Ref not found: " + e.getMessage());
+        } catch (InvalidRefNameException e) {
+            throw new JGitWrapperException("Invalid ref name: " + e.getMessage());
+        } catch (CheckoutConflictException e) {
+            throw new JGitWrapperException("Unresolved conflicts: " + e.getMessage());
         } catch (GitAPIException e) {
             throw new JGitWrapperException("General JGit exception: " + e.getMessage());
         }
