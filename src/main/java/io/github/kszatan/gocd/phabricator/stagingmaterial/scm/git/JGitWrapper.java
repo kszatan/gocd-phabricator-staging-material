@@ -59,8 +59,8 @@ public class JGitWrapper {
     public Repository cloneRepository(ScmConfiguration configuration, String workDirPath) throws JGitWrapperException {
         CloneCommand command = org.eclipse.jgit.api.Git.cloneRepository()
                 .setBare(true)
-                .setGitDir(new File(workDirPath))
                 .setNoCheckout(true)
+                .setDirectory(new File(workDirPath))
                 .setURI(configuration.getUrl());
         if (configuration.hasCredentials()) {
             command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getUsername(), configuration.getPassword()));
