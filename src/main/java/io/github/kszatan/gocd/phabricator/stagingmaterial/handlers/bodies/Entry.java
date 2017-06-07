@@ -22,42 +22,10 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies;
 
-public class ScmConfiguration {
-    private Entry url;
-    private Entry username;
-    private Entry password;
+public class Entry {
+    public String value;
 
-    public ScmConfiguration() {
-        url = new Entry();
-        username = new Entry();
-        password = new Entry();
-    }
-
-    public String getUrl() {
-        return url.value;
-    }
-
-    public String getUsername() {
-        return username.value;
-    }
-
-    public String getPassword() {
-        return password.value;
-    }
-
-    public void setUrl(String url) {
-        this.url.value = url;
-    }
-
-    public void setUsername(String username) {
-        this.username.value = username;
-    }
-
-    public void setPassword(String password) {
-        this.password.value = password;
-    }
-
-    public boolean hasCredentials() {
-        return !username.value.isEmpty() && !password.value.isEmpty();
+    public Entry() {
+        value = "";
     }
 }
