@@ -50,19 +50,19 @@ public class DiffEntry {
         String action;
         switch (entry.getChangeType()) {
             case ADD:
-                action = "Added";
+                action = "added";
                 break;
             case COPY:
-                action = "Copied";
+                action = "modified";
                 break;
             case DELETE:
-                action = "Deleted";
+                action = "deleted";
                 break;
             case MODIFY:
-                action = "Modified";
+                action = "modified";
                 break;
             case RENAME:
-                action = "Renamed";
+                action = "modified";
                 break;
             default:
                 action = "Changed";
