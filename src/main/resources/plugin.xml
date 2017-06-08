@@ -2,7 +2,7 @@
 <go-plugin id="PhabricatorStagingMaterial" version="1">
     <about>
         <name>Phabricator Staging Material Plugin</name>
-        <version>0.1</version>
+        <version>0.9</version>
         <target-go-version>17.4.0</target-go-version>
         <description>Plugin that polls a Phabricator staging area for new revisions</description>
         <vendor>
