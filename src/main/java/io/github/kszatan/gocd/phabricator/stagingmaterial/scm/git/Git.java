@@ -102,33 +102,37 @@ public class Git implements Scm {
 
     @Override
     public Optional<LatestRevisionsSinceResponse> getLatestRevisionsSince(String workDirPath, Revision latestRevision) {
-        ArrayList<Revision> revisions = new ArrayList<>();
+        ArrayList<Revision> revisions;
         try {
             Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath, true);
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
             Integer latestRevisionNum = Integer.valueOf(latestRevision.revision);
-            List<Tag> latestTags = tagList.stream()
-                    .filter(t -> t.getName().startsWith(TAG_PREFIX))
-                    .filter(t -> {
-                        String rev = getLastRevisionNumber(t);
-                        return Integer.valueOf(rev) > latestRevisionNum;
-                    })
-                    .sorted(Comparator.comparing(Tag::getName))
-                    .collect(Collectors.toList());
-            for (Tag tag : latestTags) {
-                Revision revision = new Revision();
-                revision.revision = getLastRevisionNumber(tag);
-                Commit tip = getLastCommitForTag(repository, tag);
-                fillRevisionCommitInfo(revision, tip);
-                Commit tipParent = tip.parent();
-                fillRevisionModifiedFiles(revision, jgitWrapper.diff(repository, tip, tipParent));
-                revisions.add(revision);
-            }
+            List<Tag> latestTags = getTagsAddedSinceLatestRevision(tagList, latestRevisionNum);
+            revisions = getLastRevisionsInfoForTags(repository, latestTags);
         } catch (JGitWrapperException e) {
             lastErrorMessage = e.getMessage();
             return Optional.empty();
         }
         return Optional.of(new LatestRevisionsSinceResponse(revisions));
+    }
+
+    private ArrayList<Revision> getLastRevisionsInfoForTags(Repository repository, List<Tag> latestTags) throws JGitWrapperException {
+        ArrayList<Revision> revisions = new ArrayList<>();
+        for (Tag tag : latestTags) {
+            revisions.add(getLastRevisionInfoForTag(repository, tag));
+        }
+        return revisions;
+    }
+
+    private List<Tag> getTagsAddedSinceLatestRevision(Collection<Tag> tagList, Integer latestRevisionNum) {
+        return tagList.stream()
+                .filter(t -> t.getName().startsWith(TAG_PREFIX))
+                .filter(t -> {
+                    String rev = getLastRevisionNumber(t);
+                    return Integer.valueOf(rev) > latestRevisionNum;
+                })
+                .sorted(Comparator.comparing(Tag::getName))
+                .collect(Collectors.toList());
     }
 
     @Override
