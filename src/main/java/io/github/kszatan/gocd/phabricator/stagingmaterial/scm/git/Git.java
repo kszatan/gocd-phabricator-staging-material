@@ -22,7 +22,6 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.scm.git;
 
-import com.thoughtworks.go.plugin.api.logging.Logger;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.*;
 import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.Scm;
 
@@ -64,24 +63,41 @@ public class Git implements Scm {
         try {
             Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath, true);
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
-            Optional<Tag> lastRevisionTag = tagList.stream()
-                    .filter(t -> t.getName().startsWith(TAG_PREFIX))
-                    .sorted(Comparator.comparing(Tag::getName))
-                    .reduce((a, b) -> b);
+            Optional<Tag> lastRevisionTag = getLastRevisionTag(tagList);
             if (lastRevisionTag.isPresent()) {
-                Tag tag = lastRevisionTag.get();
-                revision.revision = tag.getName().replace(TAG_PREFIX, "");
-                Collection<Commit> commits = jgitWrapper.log(repository, tag);
-                Commit tip = commits.iterator().next();
-                fillRevisionCommitInfo(revision, tip);
-                Commit tipParent = tip.parent();
-                fillRevisionModifiedFiles(revision, jgitWrapper.diff(repository, tip, tipParent));
+                revision = getLastRevisionInfoForTag(repository, lastRevisionTag.get());
             }
         } catch (JGitWrapperException e) {
             lastErrorMessage = e.getMessage();
             return Optional.empty();
         }
         return Optional.of(new LatestRevisionResponse(revision));
+    }
+
+    private Revision getLastRevisionInfoForTag(Repository repository, Tag tag) throws JGitWrapperException {
+        Revision revision = new Revision();
+        revision.revision = getLastRevisionNumber(tag);
+        Commit tip = getLastCommitForTag(repository, tag);
+        fillRevisionCommitInfo(revision, tip);
+        Collection<DiffEntry> diff = jgitWrapper.diff(repository, tip, tip.parent());
+        fillRevisionModifiedFiles(revision, diff);
+        return revision;
+    }
+
+    private Commit getLastCommitForTag(Repository repository, Tag tag) throws JGitWrapperException {
+        Collection<Commit> commits = jgitWrapper.log(repository, tag);
+        return commits.iterator().next();
+    }
+
+    private String getLastRevisionNumber(Tag tag) {
+        return tag.getName().replace(TAG_PREFIX, "");
+    }
+
+    private Optional<Tag> getLastRevisionTag(Collection<Tag> tagList) {
+        return tagList.stream()
+                .filter(t -> t.getName().startsWith(TAG_PREFIX))
+                .sorted(Comparator.comparing(Tag::getName))
+                .reduce((a, b) -> b);
     }
 
     @Override
@@ -94,16 +110,15 @@ public class Git implements Scm {
             List<Tag> latestTags = tagList.stream()
                     .filter(t -> t.getName().startsWith(TAG_PREFIX))
                     .filter(t -> {
-                        String rev = t.getName().replace(TAG_PREFIX, "");
+                        String rev = getLastRevisionNumber(t);
                         return Integer.valueOf(rev) > latestRevisionNum;
                     })
                     .sorted(Comparator.comparing(Tag::getName))
                     .collect(Collectors.toList());
             for (Tag tag : latestTags) {
                 Revision revision = new Revision();
-                revision.revision = tag.getName().replace(TAG_PREFIX, "");
-                Collection<Commit> commits = jgitWrapper.log(repository, tag);
-                Commit tip = commits.iterator().next();
+                revision.revision = getLastRevisionNumber(tag);
+                Commit tip = getLastCommitForTag(repository, tag);
                 fillRevisionCommitInfo(revision, tip);
                 Commit tipParent = tip.parent();
                 fillRevisionModifiedFiles(revision, jgitWrapper.diff(repository, tip, tipParent));
