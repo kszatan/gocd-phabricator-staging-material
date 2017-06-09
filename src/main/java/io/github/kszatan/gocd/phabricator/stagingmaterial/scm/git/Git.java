@@ -34,6 +34,8 @@ public class Git implements Scm {
     private final JGitWrapper jgitWrapper;
     private String lastErrorMessage;
 
+    private static final String TAG_PREFIX = "refs/tags/phabricator/diff/";
+
     public Git(ScmConfiguration configuration, JGitWrapper jgitWrapper) {
         this.configuration = configuration;
         this.jgitWrapper = jgitWrapper;
@@ -63,12 +65,12 @@ public class Git implements Scm {
             Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, workDirPath, true);
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
             Optional<Tag> lastRevisionTag = tagList.stream()
-                    .filter(t -> t.getName().startsWith("refs/tags/phabricator/diff/"))
+                    .filter(t -> t.getName().startsWith(TAG_PREFIX))
                     .sorted(Comparator.comparing(Tag::getName))
                     .reduce((a, b) -> b);
             if (lastRevisionTag.isPresent()) {
                 Tag tag = lastRevisionTag.get();
-                revision.revision = tag.getName().replace("refs/tags/phabricator/diff/", "");
+                revision.revision = tag.getName().replace(TAG_PREFIX, "");
                 Collection<Commit> commits = jgitWrapper.log(repository, tag);
                 Commit tip = commits.iterator().next();
                 fillRevisionCommitInfo(revision, tip);
@@ -90,16 +92,16 @@ public class Git implements Scm {
             Collection<Tag> tagList = jgitWrapper.fetchTags(repository);
             Integer latestRevisionNum = Integer.valueOf(latestRevision.revision);
             List<Tag> latestTags = tagList.stream()
-                    .filter(t -> t.getName().startsWith("refs/tags/phabricator/diff/"))
+                    .filter(t -> t.getName().startsWith(TAG_PREFIX))
                     .filter(t -> {
-                        String rev = t.getName().replace("refs/tags/phabricator/diff/", "");
+                        String rev = t.getName().replace(TAG_PREFIX, "");
                         return Integer.valueOf(rev) > latestRevisionNum;
                     })
                     .sorted(Comparator.comparing(Tag::getName))
                     .collect(Collectors.toList());
             for (Tag tag : latestTags) {
                 Revision revision = new Revision();
-                revision.revision = tag.getName().replace("refs/tags/phabricator/diff/", "");
+                revision.revision = tag.getName().replace(TAG_PREFIX, "");
                 Collection<Commit> commits = jgitWrapper.log(repository, tag);
                 Commit tip = commits.iterator().next();
                 fillRevisionCommitInfo(revision, tip);
@@ -118,7 +120,7 @@ public class Git implements Scm {
     public Boolean checkout(Revision revision, String checkoutDirPath) {
         try {
             Repository repository = jgitWrapper.cloneOrUpdateRepository(configuration, checkoutDirPath, false);
-            jgitWrapper.checkout(repository, "refs/tags/phabricator/diff/" + revision.revision);
+            jgitWrapper.checkout(repository, TAG_PREFIX + revision.revision);
             return true;
         } catch (JGitWrapperException e) {
             lastErrorMessage = e.getMessage();
