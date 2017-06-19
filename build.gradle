@@ -25,6 +25,16 @@ apply plugin: 'java'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+project.ext.pluginDesc = [
+        id         : 'io.github.kszatan.gocd.phabricator.stagingmaterial',
+        version    : project.version,
+        goCdVersion: '17.4.0',
+        name       : 'Phabricator Staging Area Material Plugin',
+        description: 'Plugin that polls a Phabricator staging area for new revisions.',
+        vendorName : 'Krzysztof Szatan',
+        vendorUrl  : 'https://github.com/kszatan/gocd-phabricator-staging-material'
+]
+
 repositories {
     mavenCentral()
     jcenter()
@@ -42,6 +52,14 @@ dependencies {
 jar {
     from(configurations.compile) {
         into "lib/"
+    }
+}
+
+processResources {
+    from("src/main/resource-templates") {
+        filesMatching('plugin.xml') {
+            expand project.pluginDesc
+        }
     }
 }
 
