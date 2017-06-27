@@ -17,11 +17,5 @@ GoCD SCM plugin for handling Phabricator staging areas.
 
 ## Caveats
 * Due to a [bug](https://github.com/gocd/gocd/issues/2947) in GoCD, plugin materials are not visible when creating a new pipeline.
-* There are some problems with hashed _known_hosts_ file. If you get errors about unknown host, execute this command on 
-your GoCD agent/server: 
-  ```
-  $ ssh-keyscan -t rsa [host] >> ~/.ssh/known_hosts
-  ```
-  [JSch](http://www.jcraft.com/jsch/) supports hashed _known_hosts_ files so this may get fixed soon.
 * GoCD is [not able to manage SSH keys](https://github.com/gocd/gocd/issues/430) so this plugin won't work with
 password-protected SSH keys. Passwordless keys need some [work](https://github.com/gocd/gocd/issues/1815).
