@@ -53,18 +53,6 @@ public class JGitWrapper {
         return call(lsRemote);
     }
 
-    public Repository cloneRepository(ScmConfiguration configuration, String workDirPath, Boolean bare) throws JGitWrapperException {
-        CloneCommand command = org.eclipse.jgit.api.Git.cloneRepository()
-                .setBare(bare)
-                .setNoCheckout(true)
-                .setDirectory(new File(workDirPath))
-                .setURI(configuration.getUrl());
-        if (configuration.hasCredentials()) {
-            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getUsername(), configuration.getPassword()));
-        }
-        return call(command);
-    }
-
     public Repository cloneOrUpdateRepository(ScmConfiguration configuration, String workDirPath, Boolean bare) throws JGitWrapperException {
         org.eclipse.jgit.api.Git git;
         try {
@@ -75,6 +63,19 @@ public class JGitWrapper {
             return cloneRepository(configuration, workDirPath, bare);
         }
         return new Repository(git);
+    }
+
+    private Repository cloneRepository(ScmConfiguration configuration, String workDirPath, Boolean bare) throws JGitWrapperException {
+        CloneCommand command = org.eclipse.jgit.api.Git.cloneRepository()
+                .setBare(bare)
+                .setCloneSubmodules(true)
+                .setNoCheckout(bare)
+                .setDirectory(new File(workDirPath))
+                .setURI(configuration.getUrl());
+        if (configuration.hasCredentials()) {
+            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(configuration.getUsername(), configuration.getPassword()));
+        }
+        return call(command);
     }
 
     public Collection<Tag> fetchTags(Repository repository) throws JGitWrapperException {
@@ -137,6 +138,8 @@ public class JGitWrapper {
             throw new JGitWrapperException("Invalid remote: " + e.getMessage());
         } catch (GitAPIException e) {
             throw new JGitWrapperException("General JGit exception: " + e.getMessage());
+        } catch (JGitInternalException e) {
+            throw new JGitWrapperException("Runtime JGit exception: " + e.getMessage());
         }
         return refs.stream().map(Ref::getName).collect(Collectors.toList());
     }
