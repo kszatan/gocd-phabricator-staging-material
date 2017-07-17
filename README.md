@@ -1,7 +1,7 @@
+[![Build Status](https://travis-ci.org/kszatan/gocd-phabricator-staging-material.svg?branch=master)](https://travis-ci.org/kszatan/gocd-phabricator-staging-material)
+
 # gocd-phabricator-staging-material
 GoCD SCM plugin for handling Phabricator staging areas.
-
-[![Build Status](https://travis-ci.org/kszatan/gocd-phabricator-staging-material.svg?branch=master)](https://travis-ci.org/kszatan/gocd-phabricator-staging-material)
 
 ## Requirements
 
