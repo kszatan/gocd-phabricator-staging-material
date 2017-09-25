@@ -22,10 +22,11 @@
 
 package io.github.kszatan.gocd.phabricator.stagingmaterial.handlers;
 
-import com.thoughtworks.go.plugin.api.exceptions.UnhandledRequestTypeException;
 import com.thoughtworks.go.plugin.api.request.DefaultGoPluginApiRequest;
 import com.thoughtworks.go.plugin.api.response.DefaultGoPluginApiResponse;
 import com.thoughtworks.go.plugin.api.response.GoPluginApiResponse;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.GsonService;
+import io.github.kszatan.gocd.phabricator.stagingmaterial.handlers.bodies.ScmConnectionResponse;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,10 +49,35 @@ public class CheckScmConnectionRequestHandlerTest {
     }
 
     @Test
-    public void handleShouldReturnErrorResponseWhenGivenInvalidJson() {
+    public void handleShouldReturnValidationFailedResponseWhenGivenIncompleteJson() {
+        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "validate-scm-configuration");
+        request.setRequestBody("{}");
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.VALIDATION_FAILED));
+        assertThat(response.responseBody(), equalTo("Missing fields: [scm-configuration]"));
+    }
+
+    @Test
+    public void handleShouldReturnInternalErrorResponseWhenGivenInvalidJson() {
         DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "validate-scm-configuration");
         request.setRequestBody("Invalid JSON");
         GoPluginApiResponse response = handler.handle(request);
         assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.INTERNAL_ERROR));
+        ScmConnectionResponse scmConnectionResponse = GsonService.fromJson(response.responseBody(), ScmConnectionResponse.class);
+        assertThat(scmConnectionResponse.status, equalTo("failure"));
+        assertThat(scmConnectionResponse.messages.size(), equalTo(1));
+        assertThat(scmConnectionResponse.messages.iterator().next(), equalTo("Malformed JSON: Invalid JSON"));
+    }
+
+    @Test
+    public void handleShouldReturnSuccessResponseWithErrorMessageWhenGivenGitScmWithoutUrl() {
+        DefaultGoPluginApiRequest request = new DefaultGoPluginApiRequest("scm", "1.0", "validate-scm-configuration");
+        request.setRequestBody("{\"scm-configuration\":{\"url\":{\"value\":\"\"},\"username\":{\"value\":\"kszatan\"},\"password\":{\"value\":\"hunter2\"}}}");
+        GoPluginApiResponse response = handler.handle(request);
+        assertThat(response.responseCode(), equalTo(DefaultGoPluginApiResponse.SUCCESS_RESPONSE_CODE));
+        ScmConnectionResponse scmConnectionResponse = GsonService.fromJson(response.responseBody(), ScmConnectionResponse.class);
+        assertThat(scmConnectionResponse.status, equalTo("failure"));
+        assertThat(scmConnectionResponse.messages.size(), equalTo(1));
+        assertThat(scmConnectionResponse.messages.iterator().next(), equalTo("URL is empty"));
     }
 }

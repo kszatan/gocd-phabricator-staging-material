@@ -44,7 +44,12 @@ public class ConfigurationValidator {
 
     private List<ScmConfigurationValidationError> validateUrl(String url) {
         List<ScmConfigurationValidationError> errors = new ArrayList<>();
-        if (!pattern.matcher(url).matches()) {
+        if (url.isEmpty()) {
+            ScmConfigurationValidationError error = new ScmConfigurationValidationError();
+            error.key = "url";
+            error.message = "URL is empty";
+            errors.add(error);
+        } else if (!pattern.matcher(url).matches()) {
             ScmConfigurationValidationError error = new ScmConfigurationValidationError();
             error.key = "url";
             error.message = "Invalid git remote URL format";

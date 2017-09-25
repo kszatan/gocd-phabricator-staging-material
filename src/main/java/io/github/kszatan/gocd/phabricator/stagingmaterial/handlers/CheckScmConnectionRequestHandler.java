@@ -31,6 +31,7 @@ import io.github.kszatan.gocd.phabricator.stagingmaterial.scm.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CheckScmConnectionRequestHandler implements RequestHandler {
     private final ScmFactory scmFactory;
@@ -42,23 +43,33 @@ public class CheckScmConnectionRequestHandler implements RequestHandler {
     public CheckScmConnectionRequestHandler(ScmFactory scmFactory) {
         this.scmFactory = scmFactory;
     }
-    
+
     @Override
     public GoPluginApiResponse handle(GoPluginApiRequest request) {
         GoPluginApiResponse response;
         try {
             ScmConfigurationRequest configurationRequest = new ScmConfigurationRequest(request.requestBody());
             ScmConfiguration configuration = configurationRequest.getConfiguration();
-            Scm scm = scmFactory.create(ScmType.GIT, configuration);
-            if (scm.canConnect()) {
-                List<String> messages = Collections.singletonList("Successfully connected to " + configuration.getUrl());
-                response = DefaultGoPluginApiResponse.success(
-                        ScmConnectionResponse.success(messages).toJson());
+            ConfigurationValidator validator = new ConfigurationValidator();
+            ScmConfigurationValidationResponse validationResult = validator.validate(configuration);
+            if (!validationResult.errors.isEmpty()) {
+                Collection<String> messages = validationResult.errors.stream().map(e -> e.message).collect(Collectors.toList());
+                response = DefaultGoPluginApiResponse.success(ScmConnectionResponse.failure(messages).toJson());
             } else {
-                Collection<String> messages = Collections.singletonList(scm.getLastErrorMessage());
-                response = DefaultGoPluginApiResponse.error(ScmConnectionResponse.failure(messages).toJson());
+                Scm scm = scmFactory.create(ScmType.GIT, configuration);
+                if (scm.canConnect()) {
+                    List<String> messages = Collections.singletonList("Successfully connected to " + configuration.getUrl());
+                    response = DefaultGoPluginApiResponse.success(
+                            ScmConnectionResponse.success(messages).toJson());
+                } else {
+                    Collection<String> messages = Collections.singletonList(scm.getLastErrorMessage());
+                    response = DefaultGoPluginApiResponse.success(ScmConnectionResponse.failure(messages).toJson());
+                }
             }
-        } catch (UnsupportedScmTypeException | InvalidJson e) {
+        } catch (UnsupportedScmTypeException e) {
+            response = DefaultGoPluginApiResponse.success(
+                    ScmConnectionResponse.success(Collections.singletonList(e.getMessage())).toJson());
+        } catch (InvalidJson e) {
             response = DefaultGoPluginApiResponse.error(
                     ScmConnectionResponse.failure(Collections.singletonList(e.getMessage())).toJson());
         } catch (IncompleteJson e) {
